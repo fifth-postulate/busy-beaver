@@ -10,6 +10,8 @@ enum Direction {
     Right,
 }
 
+type State = u8;
+
 #[cfg(test)]
 mod tests {
     use super::*;
