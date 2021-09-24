@@ -10,7 +10,11 @@ enum Direction {
     Right,
 }
 
-type State = u8;
+#[derive(Debug, PartialEq, Eq)]
+enum State {
+    Halt,
+    Number(u8),
+}
 
 #[cfg(test)]
 mod tests {
@@ -38,5 +42,11 @@ mod tests {
     fn distinct_direction_are_distinct() {
         assert_ne!(Direction::Left, Direction::Right);
         assert_ne!(Direction::Right, Direction::Left);
+    }
+
+    #[test]
+    fn distinct_states_are_distinct() {
+        assert_ne!(State::Halt, State::Number(0u8));
+        assert_ne!(State::Number(0u8), State::Halt);
     }
 }
