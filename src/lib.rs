@@ -1,3 +1,5 @@
+mod turing;
+
 #[cfg(test)]
 mod tests {
     #[test]
