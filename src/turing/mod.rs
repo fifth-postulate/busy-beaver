@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 #[derive(Debug, PartialEq, Eq)]
 enum Symbol {
     Blank,
@@ -14,6 +16,21 @@ enum Direction {
 enum State {
     Halt,
     Number(u8),
+}
+
+type Program = HashMap<Key, Action>;
+
+#[derive(Debug, PartialEq, Eq)]
+struct Key {
+    state: State,
+    symbol: Symbol,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct Action {
+    symbol: Symbol,
+    direction: Direction,
+    state: State,
 }
 
 #[cfg(test)]
