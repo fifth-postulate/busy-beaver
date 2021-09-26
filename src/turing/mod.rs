@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::convert::{From, Into};
 use std::ops::{Index, IndexMut};
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
@@ -37,12 +38,43 @@ impl State {
     }
 }
 
-type Program = HashMap<Key, Action>;
+struct Program {
+    program: HashMap<Key, Action>,
+}
+
+impl Program {
+    fn new() -> Self {
+        Self {
+            program: HashMap::new(),
+        }
+    }
+
+    fn insert<K, A>(&mut self, key: K, action: A)
+    where
+        K: Into<Key>,
+        A: Into<Action>,
+    {
+        self.program.insert(key.into(), action.into());
+    }
+
+    fn get(&self, key: &Key) -> Option<&Action> {
+        self.program.get(key)
+    }
+}
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 struct Key {
     state: State,
     symbol: Symbol,
+}
+
+impl From<(State, Symbol)> for Key {
+    fn from(key: (State, Symbol)) -> Self {
+        Self {
+            state: key.0,
+            symbol: key.1,
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
@@ -51,6 +83,17 @@ struct Action {
     direction: Direction,
     state: State,
 }
+
+impl From<(Symbol, Direction, State)> for Action {
+    fn from(action: (Symbol, Direction, State)) -> Self {
+        Self {
+            symbol: action.0,
+            direction: action.1,
+            state: action.2,
+        }
+    }
+}
+
 struct Tape {
     right: Vec<Symbol>,
     left: Vec<Symbol>,
@@ -202,50 +245,22 @@ mod tests {
 
     #[test]
     fn a_simple_machine_can_be_run() {
-        let mut program: Program = HashMap::new();
+        let mut program: Program = Program::new();
         program.insert(
-            Key {
-                state: State::Number(0),
-                symbol: Symbol::Blank,
-            },
-            Action {
-                symbol: Symbol::NonBlank,
-                direction: Direction::Right,
-                state: State::Number(1),
-            },
+            (State::Number(0), Symbol::Blank),
+            (Symbol::NonBlank, Direction::Right, State::Number(1)),
         );
         program.insert(
-            Key {
-                state: State::Number(0),
-                symbol: Symbol::NonBlank,
-            },
-            Action {
-                symbol: Symbol::NonBlank,
-                direction: Direction::Left,
-                state: State::Halt,
-            },
+            (State::Number(0), Symbol::NonBlank),
+            (Symbol::NonBlank, Direction::Left, State::Halt),
         );
         program.insert(
-            Key {
-                state: State::Number(1),
-                symbol: Symbol::Blank,
-            },
-            Action {
-                symbol: Symbol::NonBlank,
-                direction: Direction::Left,
-                state: State::Number(0),
-            },
+            (State::Number(1), Symbol::Blank),
+            (Symbol::NonBlank, Direction::Left, State::Number(0)),
         );
         program.insert(
-            Key {
-                state: State::Number(1),
-                symbol: Symbol::NonBlank,
-            },
-            Action {
-                symbol: Symbol::NonBlank,
-                direction: Direction::Right,
-                state: State::Halt,
-            },
+            (State::Number(1), Symbol::NonBlank),
+            (Symbol::NonBlank, Direction::Right, State::Halt),
         );
         let start = State::Number(0);
         let mut machine = Machine::new(start, program);
