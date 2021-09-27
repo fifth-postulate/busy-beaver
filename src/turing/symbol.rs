@@ -16,6 +16,31 @@ impl Default for &Symbol {
     }
 }
 
+struct Symbols {
+    current: Option<Symbol>,
+}
+
+impl Symbols {
+    fn all() -> Self {
+        Self {
+            current: Some(Symbol::Blank),
+        }
+    }
+}
+
+impl Iterator for Symbols {
+    type Item = Symbol;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let item = self.current;
+        self.current = match item {
+            Some(Symbol::Blank) => Some(Symbol::NonBlank),
+            _ => None,
+        };
+        item
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -30,5 +55,12 @@ mod tests {
     fn distinct_symbols_are_distinct() {
         assert_ne!(Symbol::Blank, Symbol::NonBlank);
         assert_ne!(Symbol::NonBlank, Symbol::Blank);
+    }
+
+    #[test]
+    fn symbols_all_contain_all_symbols() {
+        let actual: Vec<Symbol> = Symbols::all().collect();
+
+        assert_eq!(vec![Symbol::Blank, Symbol::NonBlank], actual);
     }
 }
