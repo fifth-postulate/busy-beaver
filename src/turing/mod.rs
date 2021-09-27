@@ -57,21 +57,11 @@ impl Program {
         A: Into<Action>,
     {
         let key = key.into();
-        let index = calculate_index(&key);
-        self.program.insert(index, action.into());
+        self.program.insert(key.idx(), action.into());
     }
 
     fn get(&self, key: &Key) -> Option<&Action> {
-        let index = calculate_index(key);
-        self.program.get(index)
-    }
-}
-
-fn calculate_index(key: &Key) -> usize {
-    match (key.state, key.symbol) {
-        (State::Number(s), Symbol::Blank) => (2 * s) as usize,
-        (State::Number(s), Symbol::NonBlank) => (2 * s + 1) as usize,
-        _ => 0
+        self.program.get(key.idx())
     }
 }
 
@@ -86,6 +76,16 @@ impl From<(State, Symbol)> for Key {
         Self {
             state: key.0,
             symbol: key.1,
+        }
+    }
+}
+
+impl Key {
+    fn idx(&self) -> usize {
+        match (self.state, self.symbol) {
+            (State::Number(s), Symbol::Blank) => (2 * s) as usize,
+            (State::Number(s), Symbol::NonBlank) => (2 * s + 1) as usize,
+            _ => 0,
         }
     }
 }
