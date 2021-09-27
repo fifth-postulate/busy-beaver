@@ -28,13 +28,13 @@ pub enum Direction {
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 pub enum State {
-    Halt,
+    Halted,
     Number(u8),
 }
 
 impl State {
     fn halted(&self) -> bool {
-        matches!(self, State::Halt)
+        matches!(self, State::Halted)
     }
 }
 
@@ -171,7 +171,7 @@ impl Machine {
                 symbol: self.tape[self.head],
             };
             match self.program.get(&key) {
-                None => self.state = State::Halt,
+                None => self.state = State::Halted,
                 Some(action) => {
                     self.tape[self.head] = action.symbol;
                     self.head = move_to(&self.head, &action.direction);
@@ -221,8 +221,8 @@ mod tests {
 
     #[test]
     fn distinct_states_are_distinct() {
-        assert_ne!(State::Halt, State::Number(0u8));
-        assert_ne!(State::Number(0u8), State::Halt);
+        assert_ne!(State::Halted, State::Number(0u8));
+        assert_ne!(State::Number(0u8), State::Halted);
     }
 
     #[test]
@@ -252,7 +252,7 @@ mod tests {
         );
         program.insert(
             (State::Number(0), Symbol::NonBlank),
-            (Symbol::NonBlank, Direction::Left, State::Halt),
+            (Symbol::NonBlank, Direction::Left, State::Halted),
         );
         program.insert(
             (State::Number(1), Symbol::Blank),
@@ -260,7 +260,7 @@ mod tests {
         );
         program.insert(
             (State::Number(1), Symbol::NonBlank),
-            (Symbol::NonBlank, Direction::Right, State::Halt),
+            (Symbol::NonBlank, Direction::Right, State::Halted),
         );
         let start = State::Number(0);
         let mut machine = Machine::new(start, program);

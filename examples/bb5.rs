@@ -37,7 +37,7 @@ fn main() {
     );
     program.insert(
         (State::Number(4), Symbol::Blank),
-        (Symbol::NonBlank, Direction::Right, State::Halt),
+        (Symbol::NonBlank, Direction::Right, State::Halted),
     ); // TODO: the action should be Halt, the state be Halted
     program.insert(
         (State::Number(4), Symbol::NonBlank),
