@@ -41,13 +41,13 @@ impl State {
 }
 
 pub struct Program {
-    program: HashMap<Key, Action>,
+    program: Vec<Action>,
 }
 
 impl Program {
     pub fn new() -> Self {
         Self {
-            program: HashMap::new(),
+            program: Vec::new(),
         }
     }
 
@@ -56,11 +56,22 @@ impl Program {
         K: Into<Key>,
         A: Into<Action>,
     {
-        self.program.insert(key.into(), action.into());
+        let key = key.into();
+        let index = calculate_index(&key);
+        self.program.insert(index, action.into());
     }
 
     fn get(&self, key: &Key) -> Option<&Action> {
-        self.program.get(key)
+        let index = calculate_index(key);
+        self.program.get(index)
+    }
+}
+
+fn calculate_index(key: &Key) -> usize {
+    match (key.state, key.symbol) {
+        (State::Number(s), Symbol::Blank) => (2 * s) as usize,
+        (State::Number(s), Symbol::NonBlank) => (2 * s + 1) as usize,
+        _ => 0
     }
 }
 
@@ -75,19 +86,6 @@ impl From<(State, Symbol)> for Key {
         Self {
             state: key.0,
             symbol: key.1,
-        }
-    }
-}
-
-impl Hash for Key {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        match (self.state, self.symbol) {
-            (State::Halted, Symbol::Blank) => state.write_u8(0),
-            (State::Halted, Symbol::NonBlank) => state.write_u8(1),
-            (State::Stuck, Symbol::Blank) => state.write_u8(2),
-            (State::Stuck, Symbol::NonBlank) => state.write_u8(3),
-            (State::Number(s), Symbol::Blank) => state.write_u8(s * 10),
-            (State::Number(s), Symbol::NonBlank) => state.write_u8(s * 10 + 1),
         }
     }
 }
