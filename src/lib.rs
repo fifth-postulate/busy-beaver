@@ -1,4 +1,4 @@
-mod turing;
+pub mod turing;
 
 #[cfg(test)]
 mod tests {

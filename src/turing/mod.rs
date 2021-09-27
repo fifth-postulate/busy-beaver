@@ -3,7 +3,7 @@ use std::convert::{From, Into};
 use std::ops::{Index, IndexMut};
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
-enum Symbol {
+pub enum Symbol {
     Blank,
     NonBlank,
 }
@@ -21,13 +21,13 @@ impl Default for &Symbol {
 }
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
-enum Direction {
+pub enum Direction {
     Left,
     Right,
 }
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
-enum State {
+pub enum State {
     Halt,
     Number(u8),
 }
@@ -38,18 +38,18 @@ impl State {
     }
 }
 
-struct Program {
+pub struct Program {
     program: HashMap<Key, Action>,
 }
 
 impl Program {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             program: HashMap::new(),
         }
     }
 
-    fn insert<K, A>(&mut self, key: K, action: A)
+    pub fn insert<K, A>(&mut self, key: K, action: A)
     where
         K: Into<Key>,
         A: Into<Action>,
@@ -124,7 +124,7 @@ impl Index<Head> for Tape {
         if index >= 0i128 {
             self.right.get(index as usize).unwrap_or_default()
         } else {
-            self.left.get((-index) as usize).unwrap_or_default()
+            self.left.get((-index - 1) as usize).unwrap_or_default()
         }
     }
 }
@@ -138,16 +138,16 @@ impl IndexMut<Head> for Tape {
             }
             self.right.index_mut(index as usize)
         } else {
-            let i = (-index) as usize;
+            let i = (-index - 1) as usize;
             if i >= self.left.len() {
                 self.left.insert(i, Symbol::Blank)
             }
-            self.left.index_mut((-index) as usize)
+            self.left.index_mut(i)
         }
     }
 }
 
-struct Machine {
+pub struct Machine {
     head: Head,
     tape: Tape,
     program: Program,
@@ -155,7 +155,7 @@ struct Machine {
 }
 
 impl Machine {
-    fn new(start_state: State, program: Program) -> Self {
+    pub fn new(start_state: State, program: Program) -> Self {
         Self {
             head: 0i128,
             tape: Tape::empty(),
@@ -181,7 +181,7 @@ impl Machine {
         }
     }
 
-    fn run(&mut self, maximum_steps: u128) -> u128 {
+    pub fn run(&mut self, maximum_steps: u128) -> u128 {
         let mut steps_taken: u128 = 0u128;
         while !self.state.halted() && steps_taken < maximum_steps {
             self.step();
