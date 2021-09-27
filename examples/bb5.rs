@@ -1,5 +1,5 @@
-use std::time::Instant;
 use busy_beaver::turing::{Direction, Machine, Program, State, Symbol};
+use std::time::Instant;
 
 fn main() {
     let mut program = Program::new();

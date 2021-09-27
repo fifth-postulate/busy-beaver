@@ -29,6 +29,7 @@ pub enum Direction {
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 pub enum State {
     Halted,
+    Stuck,
     Number(u8),
 }
 
@@ -78,15 +79,18 @@ impl From<(State, Symbol)> for Key {
 }
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
-struct Action {
-    symbol: Symbol,
-    direction: Direction,
-    state: State,
+enum Action {
+    Halt,
+    Do {
+        symbol: Symbol,
+        direction: Direction,
+        state: State,
+    },
 }
 
 impl From<(Symbol, Direction, State)> for Action {
     fn from(action: (Symbol, Direction, State)) -> Self {
-        Self {
+        Action::Do {
             symbol: action.0,
             direction: action.1,
             state: action.2,
@@ -171,11 +175,16 @@ impl Machine {
                 symbol: self.tape[self.head],
             };
             match self.program.get(&key) {
-                None => self.state = State::Halted,
-                Some(action) => {
-                    self.tape[self.head] = action.symbol;
-                    self.head = move_to(&self.head, &action.direction);
-                    self.state = action.state;
+                None => self.state = State::Stuck,
+                Some(Action::Halt) => self.state = State::Halted,
+                Some(Action::Do {
+                    symbol,
+                    direction,
+                    state,
+                }) => {
+                    self.tape[self.head] = *symbol;
+                    self.head = move_to(&self.head, &direction);
+                    self.state = *state;
                 }
             }
         }
@@ -220,9 +229,20 @@ mod tests {
     }
 
     #[test]
+    fn same_states_are_equal() {
+        assert_eq!(State::Halted, State::Halted);
+        assert_eq!(State::Stuck, State::Stuck);
+        assert_eq!(State::Number(0u8), State::Number(0u8));
+    }
+
+    #[test]
     fn distinct_states_are_distinct() {
+        assert_ne!(State::Halted, State::Stuck);
         assert_ne!(State::Halted, State::Number(0u8));
+        assert_ne!(State::Stuck, State::Halted);
+        assert_ne!(State::Stuck, State::Number(0u8));
         assert_ne!(State::Number(0u8), State::Halted);
+        assert_ne!(State::Number(0u8), State::Stuck);
     }
 
     #[test]
