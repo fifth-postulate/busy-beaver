@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::convert::{From, Into};
+use std::hash::{Hash, Hasher};
 use std::ops::{Index, IndexMut};
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
@@ -63,7 +64,7 @@ impl Program {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 struct Key {
     state: State,
     symbol: Symbol,
@@ -74,6 +75,19 @@ impl From<(State, Symbol)> for Key {
         Self {
             state: key.0,
             symbol: key.1,
+        }
+    }
+}
+
+impl Hash for Key {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        match (self.state, self.symbol) {
+            (State::Halted, Symbol::Blank) => state.write_u8(0),
+            (State::Halted, Symbol::NonBlank) => state.write_u8(1),
+            (State::Stuck, Symbol::Blank) => state.write_u8(2),
+            (State::Stuck, Symbol::NonBlank) => state.write_u8(3),
+            (State::Number(s), Symbol::Blank) => state.write_u8(s * 10),
+            (State::Number(s), Symbol::NonBlank) => state.write_u8(s * 10 + 1),
         }
     }
 }
