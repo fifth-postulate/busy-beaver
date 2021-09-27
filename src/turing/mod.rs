@@ -1,6 +1,5 @@
-use std::collections::HashMap;
 use std::convert::{From, Into};
-use std::hash::{Hash, Hasher};
+use std::hash::Hash;
 use std::ops::{Index, IndexMut};
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
@@ -65,8 +64,14 @@ impl Program {
     }
 }
 
+impl Default for Program {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
-struct Key {
+pub struct Key {
     state: State,
     symbol: Symbol,
 }
@@ -91,7 +96,7 @@ impl Key {
 }
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
-enum Action {
+pub enum Action {
     Halt,
     Do {
         symbol: Symbol,
@@ -171,12 +176,12 @@ pub struct Machine {
 }
 
 impl Machine {
-    pub fn new(start_state: State, program: Program) -> Self {
+    pub fn new(state: State, program: Program) -> Self {
         Self {
             head: 0i128,
             tape: Tape::empty(),
-            program: program,
-            state: start_state,
+            program,
+            state,
         }
     }
 
@@ -195,7 +200,7 @@ impl Machine {
                     state,
                 }) => {
                     self.tape[self.head] = *symbol;
-                    self.head = move_to(&self.head, &direction);
+                    self.head = move_to(&self.head, direction);
                     self.state = *state;
                 }
             }
