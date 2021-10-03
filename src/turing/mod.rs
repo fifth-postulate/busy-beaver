@@ -4,10 +4,10 @@ mod state;
 mod symbol;
 mod tape;
 
-pub use direction::Direction;
+pub use direction::{Direction, Directions};
 pub use program::{Action, Key, Program};
-pub use state::State;
-pub use symbol::Symbol;
+pub use state::{State, States};
+pub use symbol::{Symbol, Symbols};
 pub use tape::{move_to, Head, Tape};
 
 pub struct Machine {

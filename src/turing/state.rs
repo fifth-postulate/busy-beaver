@@ -11,16 +11,23 @@ impl State {
     }
 }
 
-struct States {
+pub struct States {
     maximum: u8,
     current: Option<State>,
 }
 
 impl States {
-    fn up_to(maximum: u8) -> Self {
+    pub fn up_to(maximum: u8) -> Self {
         Self {
             maximum,
             current: Some(State::Halted),
+        }
+    }
+
+    pub fn non_halted_up_to(maximum: u8) -> Self {
+        Self {
+            maximum,
+            current: Some(State::Number(0)),
         }
     }
 }
@@ -84,6 +91,16 @@ mod tests {
 
         assert_eq!(
             vec![State::Halted, State::Number(0), State::Number(1)],
+            actual
+        );
+    }
+
+    #[test]
+    fn non_halted_state_contain_all_non_halted_states_up_to_argument() {
+        let actual: Vec<State> = States::non_halted_up_to(3).collect();
+
+        assert_eq!(
+            vec![State::Number(0), State::Number(1), State::Number(2)],
             actual
         );
     }

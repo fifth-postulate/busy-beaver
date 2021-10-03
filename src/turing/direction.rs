@@ -4,12 +4,12 @@ pub enum Direction {
     Right,
 }
 
-struct Directions {
+pub struct Directions {
     current: Option<Direction>,
 }
 
 impl Directions {
-    fn all() -> Self {
+    pub fn all() -> Self {
         Self {
             current: Some(Direction::Left),
         }

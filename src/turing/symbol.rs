@@ -16,12 +16,12 @@ impl Default for &Symbol {
     }
 }
 
-struct Symbols {
+pub struct Symbols {
     current: Option<Symbol>,
 }
 
 impl Symbols {
-    fn all() -> Self {
+    pub fn all() -> Self {
         Self {
             current: Some(Symbol::Blank),
         }
