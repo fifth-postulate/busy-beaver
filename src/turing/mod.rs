@@ -49,14 +49,24 @@ impl Machine {
         }
     }
 
-    pub fn run(&mut self, maximum_steps: u128) -> u128 {
+    pub fn run(&mut self, maximum_steps: u128) -> Assessment {
         let mut steps_taken: u128 = 0u128;
         while !self.state.halted() && steps_taken < maximum_steps {
             self.step();
             steps_taken += 1;
         }
-        steps_taken
+        if self.state.halted() {
+            Assessment::HaltedIn(steps_taken)
+        } else {
+            Assessment::NotHalted
+        }
     }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum Assessment {
+    HaltedIn(u128),
+    NotHalted,
 }
 
 #[cfg(test)]
@@ -87,6 +97,6 @@ mod tests {
 
         let steps = machine.run(10);
 
-        assert_eq!(steps, 3);
+        assert_eq!(steps, Assessment::HaltedIn(3));
     }
 }

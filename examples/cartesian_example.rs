@@ -1,11 +1,14 @@
 use busy_beaver::turing::{Action, Directions, States, Symbols};
 use cartesian::*;
-use std::convert::{From, Into};
+use std::convert::From;
 use std::env;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let n: u8 = args.get(1).and_then(|input| input.parse().ok()).unwrap_or(5);
+    let n: u8 = args
+        .get(1)
+        .and_then(|input| input.parse().ok())
+        .unwrap_or(5);
 
     let mut count = 0;
     for state in States::up_to(n) {
