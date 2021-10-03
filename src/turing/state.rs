@@ -1,3 +1,6 @@
+use std::fmt;
+use std::fmt::{Display, Formatter};
+
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 pub enum State {
     Halted,
@@ -8,6 +11,16 @@ pub enum State {
 impl State {
     pub fn halted(&self) -> bool {
         matches!(self, State::Halted) || matches!(self, State::Stuck)
+    }
+}
+
+impl Display for State {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            State::Halted => write!(f, "H"),
+            State::Stuck => write!(f, "S"),
+            State::Number(n) => write!(f, "{}", n),
+        }
     }
 }
 

@@ -4,6 +4,8 @@ use crate::turing::symbol::{Symbol, Symbols};
 use cartesian::*;
 use std::convert::{From, Into};
 use std::iter::once;
+use std::fmt;
+use std::fmt::{Display, Formatter, Error};
 
 pub struct Program {
     program: Vec<Action>,
@@ -33,6 +35,16 @@ impl Program {
 impl Default for Program {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl Display for Program {
+    fn fmt(&self, formatter: &mut Formatter) -> Result<(), Error> {
+        let actions: Vec<String> = Keys::up_to(2)
+            .map(|k| self.get(&k))
+            .map(|ao| ao.map(|a| a.to_string() ).unwrap_or("???".to_string()))
+            .collect();
+        formatter.write_str(&actions.join(" "))
     }
 }
 
@@ -101,6 +113,15 @@ impl From<(Symbol, Direction, State)> for Action {
             symbol: action.0,
             direction: action.1,
             state: action.2,
+        }
+    }
+}
+
+impl Display for Action {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        match self {
+            Action::Halt => write!(f, "  H"),
+            Action::Do { symbol, direction, state} => write!(f, "{}{}{}", symbol, direction, state),
         }
     }
 }

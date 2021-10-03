@@ -1,3 +1,6 @@
+use std::fmt;
+use std::fmt::{Display, Formatter};
+
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 pub enum Symbol {
     Blank,
@@ -13,6 +16,15 @@ impl Default for Symbol {
 impl Default for &Symbol {
     fn default() -> Self {
         &Symbol::Blank
+    }
+}
+
+impl Display for Symbol {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            Symbol::Blank => write!(f, "0"),
+            Symbol::NonBlank => write!(f, "1"),
+        }
     }
 }
 

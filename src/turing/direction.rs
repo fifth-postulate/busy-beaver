@@ -1,7 +1,19 @@
+use std::fmt;
+use std::fmt::{Display, Formatter};
+
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum Direction {
     Left,
     Right,
+}
+
+impl Display for Direction {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            Direction::Left => write!(f, "L"),
+            Direction::Right => write!(f, "R"),
+        }
+    }
 }
 
 pub struct Directions {
