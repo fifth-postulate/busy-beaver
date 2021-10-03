@@ -61,6 +61,30 @@ impl Key {
     }
 }
 
+pub struct Keys {
+    iterator: Box<dyn Iterator<Item = Key>>,
+}
+
+impl Keys {
+    pub fn up_to(maximum: u8) -> Self {
+        let iterator = cartesian!(States::non_halted_up_to(maximum), Symbols::all()).map(|tuple| {
+            let key: Key = tuple.into();
+            key
+        });
+        Self {
+            iterator: Box::new(iterator),
+        }
+    }
+}
+
+impl Iterator for Keys {
+    type Item = Key;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iterator.next()
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum Action {
     Halt,
@@ -112,6 +136,18 @@ impl Iterator for Actions {
 mod tests {
     use super::*;
 
+    #[test]
+    fn keys_up_to_contain_all_keys_up_to_maximum() {
+        let actual: Vec<Key> = Keys::up_to(2).collect();
+        let expected: Vec<Key> = vec![
+            (State::Number(0), Symbol::Blank).into(),
+            (State::Number(0), Symbol::NonBlank).into(),
+            (State::Number(1), Symbol::Blank).into(),
+            (State::Number(1), Symbol::NonBlank).into(),
+        ];
+
+        assert_eq!(expected, actual)
+    }
     #[test]
     fn actions_up_to_contain_all_actions_up_to_maximum() {
         let actual: Vec<Action> = Actions::up_to(1).collect();
