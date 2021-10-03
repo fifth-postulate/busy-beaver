@@ -40,7 +40,8 @@ impl Default for Program {
 
 impl Display for Program {
     fn fmt(&self, formatter: &mut Formatter) -> Result<(), Error> {
-        let actions: Vec<String> = Keys::up_to(2)
+        let n = (self.program.len() / 2) as u8; // We are assume only complete programs
+        let actions: Vec<String> = Keys::up_to(n)
             .map(|k| self.get(&k))
             .map(|ao| ao.map(|a| a.to_string() ).unwrap_or("???".to_string()))
             .collect();
