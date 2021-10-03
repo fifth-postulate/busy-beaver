@@ -5,7 +5,7 @@ mod symbol;
 mod tape;
 
 pub use direction::{Direction, Directions};
-pub use program::{Action, Key, Program};
+pub use program::{Action, Actions, Key, Program};
 pub use state::{State, States};
 pub use symbol::{Symbol, Symbols};
 pub use tape::{move_to, Head, Tape};
