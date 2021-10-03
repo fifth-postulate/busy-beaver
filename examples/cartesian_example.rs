@@ -2,6 +2,7 @@ use busy_beaver::turing::{Action, Directions, States, Symbols};
 use cartesian::*;
 use std::convert::From;
 use std::env;
+use std::iter::once;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -11,17 +12,15 @@ fn main() {
         .unwrap_or(5);
 
     let mut count = 0;
-    for state in States::up_to(n) {
-        if state.halted() {
-            println!("{:?}", Action::Halt);
-            count += 1;
-        } else {
-            for tuple in cartesian!(Symbols::all(), Directions::all()) {
-                let action: Action = From::from((tuple.0, tuple.1, state));
-                println!("{:?}", action);
-                count += 1;
-            }
-        }
+    let iterator = once(Action::Halt).chain(States::non_halted_up_to(n).flat_map(|state| {
+        cartesian!(Symbols::all(), Directions::all()).map(move |tuple| {
+            let action: Action = From::from((tuple.0, tuple.1, state));
+            action
+        })
+    }));
+    for state in iterator {
+        println!("{:?}", state);
+        count += 1;
     }
     println!("{}", count);
 }
