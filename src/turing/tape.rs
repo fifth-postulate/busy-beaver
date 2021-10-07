@@ -14,6 +14,11 @@ impl Tape {
             left: Vec::new(),
         }
     }
+
+    pub fn count(&self, target: &Symbol) -> usize {
+        self.left.iter().filter(|s| *s == target).count()
+            + self.right.iter().filter(|s| *s == target).count()
+    }
 }
 
 pub type Head = i128;
@@ -75,5 +80,15 @@ mod tests {
         tape[head] = Symbol::NonBlank;
 
         assert_eq!(tape[head], Symbol::NonBlank);
+    }
+
+    #[test]
+    fn tape_can_count_symbols() {
+        let mut tape = Tape::empty();
+
+        tape[0i128] = Symbol::NonBlank;
+        tape[1i128] = Symbol::NonBlank;
+
+        assert_eq!(tape.count(&Symbol::NonBlank), 2usize);
     }
 }

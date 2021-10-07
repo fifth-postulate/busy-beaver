@@ -56,7 +56,10 @@ impl Machine {
             steps_taken += 1;
         }
         if self.state.halted() {
-            Assessment::HaltedIn(steps_taken)
+            Assessment::HaltedIn(Details {
+                steps: steps_taken,
+                score: self.tape.count(&Symbol::NonBlank),
+            })
         } else {
             Assessment::NotHalted
         }
@@ -65,8 +68,14 @@ impl Machine {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Assessment {
-    HaltedIn(u128),
+    HaltedIn(Details),
     NotHalted,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct Details {
+    steps: u128,
+    score: usize,
 }
 
 #[cfg(test)]
@@ -97,6 +106,6 @@ mod tests {
 
         let steps = machine.run(10);
 
-        assert_eq!(steps, Assessment::HaltedIn(3));
+        assert_eq!(steps, Assessment::HaltedIn(Details { steps: 3, score: 2 }));
     }
 }
