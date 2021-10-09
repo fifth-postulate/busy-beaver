@@ -1,4 +1,4 @@
-use busy_beaver::turing::Programs;
+use busy_beaver::turing::all4;
 // use std::env;
 
 fn main() {
@@ -9,7 +9,7 @@ fn main() {
     //     .unwrap_or(2);
 
     let mut count = 0;
-    for program in Programs::all4() {
+    for program in all4() {
         println!("{}", program);
         count += 1;
     }
