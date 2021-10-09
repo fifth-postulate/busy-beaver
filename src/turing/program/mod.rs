@@ -6,7 +6,9 @@ use cartesian::*;
 pub use key::{Key, Keys};
 use std::fmt;
 use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 
+#[derive(Debug, PartialEq, Eq)]
 pub struct Program {
     program: Vec<Action>,
 }
@@ -40,7 +42,7 @@ impl Default for Program {
 
 impl Display for Program {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        let n = (self.program.len() / 2) as u8; // We are assume only complete programs
+        let n = (self.program.len() / 2) as u8; // We assume only complete programs
         let actions: Vec<String> = Keys::up_to(n)
             .map(|k| self.get(&k))
             .map(|ao| {
@@ -50,6 +52,49 @@ impl Display for Program {
             .collect();
         formatter.write_str(&actions.join(" "))
     }
+}
+
+impl FromStr for Program {
+    type Err = ParseError;
+
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        if !input.is_empty() {
+            let mut program = Program::new();
+            let mut action_index = 0;
+            let mut index = 4 * action_index;
+            while index < input.len() && (index + 3) <= input.len() {
+                let action = input[index..(index + 3)]
+                    .parse::<Action>()
+                    .map_err(|error| {
+                        ParseError::ActionProblem(ActionProblemDetail { index, error })
+                    })?;
+                let key: Key = action_index.into();
+                program.insert(key, action);
+                action_index += 1;
+                index = 4 * action_index;
+            }
+            if action_index % 2 == 0 {
+                Ok(program)
+            } else {
+                Err(ParseError::InsufficientActions(action_index))
+            }
+        } else {
+            Err(ParseError::NoInput)
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum ParseError {
+    ActionProblem(ActionProblemDetail),
+    InsufficientActions(usize),
+    NoInput,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct ActionProblemDetail {
+    index: usize,
+    error: action::ParseError,
 }
 
 pub struct Programs {
@@ -185,6 +230,30 @@ impl Iterator for Programs {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::turing::{Direction, State, Symbol};
+
+    #[test]
+    fn programs_can_be_parsed() {
+        let mut expected = Program::new();
+        expected.insert(
+            (State::Number(0), Symbol::Blank),
+            (Symbol::NonBlank, Direction::Right, State::Number(1)),
+        );
+        expected.insert(
+            (State::Number(0), Symbol::NonBlank),
+            (Symbol::Blank, Direction::Right, State::Number(1)),
+        );
+        expected.insert(
+            (State::Number(1), Symbol::Blank),
+            (Symbol::NonBlank, Direction::Left, State::Number(1)),
+        );
+        expected.insert(
+            (State::Number(1), Symbol::NonBlank),
+            (Symbol::NonBlank, Direction::Right, State::Number(2)),
+        );
+
+        assert_eq!(Ok(expected), "1R1 0R1 1L1 1R2".parse())
+    }
 
     #[test]
     fn all1_contains_correct_number_of_programs() {

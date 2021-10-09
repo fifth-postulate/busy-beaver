@@ -1,11 +1,15 @@
+use crate::turing::direction;
 use crate::turing::direction::{Direction, Directions};
+use crate::turing::state;
 use crate::turing::state::{State, States};
+use crate::turing::symbol;
 use crate::turing::symbol::{Symbol, Symbols};
 use cartesian::*;
 use std::convert::{From, Into};
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::iter::once;
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum Action {
@@ -40,6 +44,46 @@ impl Display for Action {
     }
 }
 
+impl FromStr for Action {
+    type Err = ParseError;
+
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        if input.len() == 3 {
+            match input {
+                "  H" => Ok(Action::Halt),
+                _ => {
+                    let symbol = input[0..1]
+                        .parse::<Symbol>()
+                        .map_err(ParseError::SymbolProblem)?;
+                    let direction = input[1..2]
+                        .parse::<Direction>()
+                        .map_err(ParseError::DirectionProblem)?;
+                    let state = input[2..3]
+                        .parse::<State>()
+                        .map_err(ParseError::StateProblem)?;
+
+                    Ok(Action::Do {
+                        symbol,
+                        direction,
+                        state,
+                    })
+                }
+            }
+        } else {
+            Err(ParseError::IncorrectLength(input.len()))
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum ParseError {
+    IncorrectLength(usize),
+    SymbolProblem(symbol::ParseError),
+    DirectionProblem(direction::ParseError),
+    StateProblem(state::ParseError),
+    UnknownSymbol(String),
+}
+
 pub struct Actions {
     iterator: Box<dyn Iterator<Item = Action>>,
 }
@@ -70,6 +114,46 @@ impl Iterator for Actions {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn actions_can_be_parsed() {
+        assert_eq!(Ok(Action::Halt), "  H".parse());
+        assert_eq!(
+            Ok(Action::Do {
+                symbol: Symbol::Blank,
+                direction: Direction::Left,
+                state: State::Number(1)
+            }),
+            "0L1".parse()
+        );
+    }
+
+    #[test]
+    fn parse_checks_for_errors() {
+        assert_eq!(Err(ParseError::IncorrectLength(2)), "..".parse::<Action>());
+        assert_eq!(
+            Err(ParseError::IncorrectLength(4)),
+            "....".parse::<Action>()
+        );
+        assert_eq!(
+            Err(ParseError::SymbolProblem(
+                symbol::ParseError::UnknownSymbol(" ".to_owned())
+            )),
+            " L1".parse::<Action>()
+        );
+        assert_eq!(
+            Err(ParseError::DirectionProblem(
+                direction::ParseError::UnknownSymbol("H".to_owned())
+            )),
+            "0H1".parse::<Action>()
+        );
+        assert_eq!(
+            Err(ParseError::StateProblem(state::ParseError::UnknownSymbol(
+                "a".to_owned()
+            ))),
+            "0La".parse::<Action>()
+        );
+    }
 
     #[test]
     fn actions_up_to_contain_all_actions_up_to_maximum() {

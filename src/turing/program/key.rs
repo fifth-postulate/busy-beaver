@@ -17,6 +17,14 @@ impl From<(State, Symbol)> for Key {
     }
 }
 
+impl From<usize> for Key {
+    fn from(index: usize) -> Self {
+        let state: State = index.into();
+        let symbol: Symbol = index.into();
+        Self { state, symbol }
+    }
+}
+
 impl Key {
     pub fn idx(&self) -> usize {
         match (self.state, self.symbol) {

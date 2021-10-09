@@ -1,5 +1,6 @@
 use std::fmt;
 use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum Direction {
@@ -14,6 +15,23 @@ impl Display for Direction {
             Direction::Right => write!(f, "R"),
         }
     }
+}
+
+impl FromStr for Direction {
+    type Err = ParseError;
+
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        match input {
+            "L" => Ok(Direction::Left),
+            "R" => Ok(Direction::Right),
+            _ => Err(ParseError::UnknownSymbol(input.to_owned())),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum ParseError {
+    UnknownSymbol(String),
 }
 
 pub struct Directions {
@@ -55,6 +73,12 @@ mod tests {
     fn distinct_direction_are_distinct() {
         assert_ne!(Direction::Left, Direction::Right);
         assert_ne!(Direction::Right, Direction::Left);
+    }
+
+    #[test]
+    fn directions_can_be_parsed() {
+        assert_eq!(Ok(Direction::Left), "L".parse());
+        assert_eq!(Ok(Direction::Right), "R".parse());
     }
 
     #[test]

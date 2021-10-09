@@ -1,5 +1,6 @@
 use std::fmt;
 use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 pub enum State {
@@ -22,6 +23,34 @@ impl Display for State {
             State::Number(n) => write!(f, "{}", n),
         }
     }
+}
+
+impl From<usize> for State {
+    fn from(index: usize) -> Self {
+        let n = index / 2;
+        State::Number(n as u8)
+    }
+}
+
+impl FromStr for State {
+    type Err = ParseError;
+
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        match input {
+            "H" => Ok(State::Halted),
+            _ => {
+                let index = input.parse::<u8>();
+                index
+                    .map(State::Number)
+                    .map_err(|_e| ParseError::UnknownSymbol(input.to_owned()))
+            }
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum ParseError {
+    UnknownSymbol(String),
 }
 
 pub struct States {
@@ -96,6 +125,13 @@ mod tests {
     fn halted_and_stuck_are_halted_states() {
         assert!(State::Halted.halted());
         assert!(State::Stuck.halted());
+    }
+
+    #[test]
+    fn states_can_be_parsed() {
+        assert_eq!(Ok(State::Halted), "H".parse());
+        assert_eq!(Ok(State::Number(0)), "0".parse());
+        assert_eq!(Ok(State::Number(1)), "1".parse());
     }
 
     #[test]

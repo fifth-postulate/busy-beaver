@@ -1,5 +1,6 @@
 use std::fmt;
 use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 pub enum Symbol {
@@ -26,6 +27,32 @@ impl Display for Symbol {
             Symbol::NonBlank => write!(f, "1"),
         }
     }
+}
+
+impl From<usize> for Symbol {
+    fn from(index: usize) -> Self {
+        match index % 2 {
+            1 => Symbol::NonBlank,
+            _ => Symbol::Blank,
+        }
+    }
+}
+
+impl FromStr for Symbol {
+    type Err = ParseError;
+
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        match input {
+            "0" => Ok(Symbol::Blank),
+            "1" => Ok(Symbol::NonBlank),
+            _ => Err(ParseError::UnknownSymbol(input.to_owned())),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum ParseError {
+    UnknownSymbol(String),
 }
 
 pub struct Symbols {
@@ -67,6 +94,12 @@ mod tests {
     fn distinct_symbols_are_distinct() {
         assert_ne!(Symbol::Blank, Symbol::NonBlank);
         assert_ne!(Symbol::NonBlank, Symbol::Blank);
+    }
+
+    #[test]
+    fn symbols_can_be_parsed() {
+        assert_eq!(Ok(Symbol::Blank), "0".parse());
+        assert_eq!(Ok(Symbol::NonBlank), "1".parse());
     }
 
     #[test]
