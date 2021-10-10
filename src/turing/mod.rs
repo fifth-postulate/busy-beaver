@@ -18,7 +18,16 @@ pub struct Machine {
 }
 
 impl Machine {
-    pub fn new(state: State, program: Program) -> Self {
+    pub fn new(program: Program) -> Self {
+        Self {
+            head: 0i128,
+            tape: Tape::empty(),
+            state: State::Number(0),
+            program,
+        }
+    }
+
+    pub fn with_state(state: State, program: Program) -> Self {
         Self {
             head: 0i128,
             tape: Tape::empty(),
@@ -72,10 +81,10 @@ pub enum Assessment {
     NotHalted,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct Details {
-    steps: u128,
-    score: usize,
+    pub steps: u128,
+    pub score: usize,
 }
 
 #[cfg(test)]
@@ -102,7 +111,7 @@ mod tests {
             (Symbol::NonBlank, Direction::Right, State::Halted),
         );
         let start = State::Number(0);
-        let mut machine = Machine::new(start, program);
+        let mut machine = Machine::with_state(start, program);
 
         let steps = machine.run(10);
 
