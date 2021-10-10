@@ -196,28 +196,21 @@ macro_rules! all_programs {
 }
 
 all_programs!(1, all1);
-// all_programs!(2, all2);
+all_programs!(2, all2);
 all_programs!(3, all3);
 all_programs!(4, all4);
 all_programs!(5, all5);
 
-pub fn all2() -> Programs {
-    let iterator = cartesian!(
-        Actions::up_to(2),
-        Actions::up_to(2),
-        Actions::up_to(2),
-        Actions::up_to(2)
-    )
-    .map(|tuple| vec![tuple.0, tuple.1, tuple.2, tuple.3])
-    .map(|actions| {
-        let mut program = Program::new();
-        for (key, action) in Keys::up_to(2).zip(actions) {
-            program.insert(key, action);
+impl Programs {
+    pub fn all(n: u8) -> Self {
+        match n {
+            1 => all1(),
+            2 => all2(),
+            3 => all3(),
+            4 => all4(),
+            5 => all5(),
+            _ => panic!("it is unwise to go beyond 5"),
         }
-        program
-    });
-    Programs {
-        iterator: Box::new(iterator),
     }
 }
 
