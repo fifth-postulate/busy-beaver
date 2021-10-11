@@ -18,7 +18,7 @@ impl<'a> GraphWriter<'a> {
         for (key, action) in program {
             if let Action::Do {
                 state,
-                symbol,
+                symbol: _,
                 direction: _,
             } = action
             {
@@ -27,7 +27,7 @@ impl<'a> GraphWriter<'a> {
                 let mut finish: String = String::new();
                 write!(finish, "{}", state)?;
                 let mut label = String::new();
-                write!(label, "{}", symbol)?;
+                write!(label, "{}", key.symbol)?;
                 digraph.edge(start, finish).attributes().set_label(&label);
             }
         }
