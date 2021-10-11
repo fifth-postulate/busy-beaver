@@ -1,3 +1,4 @@
+pub mod graph;
 pub mod turing;
 
 #[cfg(test)]

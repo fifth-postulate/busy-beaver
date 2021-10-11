@@ -6,6 +6,7 @@ use cartesian::*;
 pub use key::{Key, Keys};
 use std::fmt;
 use std::fmt::{Display, Formatter};
+use std::iter::IntoIterator;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -95,6 +96,41 @@ pub enum ParseError {
 pub struct ActionProblemDetail {
     index: usize,
     error: action::ParseError,
+}
+
+pub struct KeyActionIterator<'a> {
+    index: usize,
+    program: &'a Program,
+}
+
+impl<'a> IntoIterator for &'a Program {
+    type Item = (Key, Action);
+    type IntoIter = KeyActionIterator<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        KeyActionIterator::new(self)
+    }
+}
+
+impl<'a> KeyActionIterator<'a> {
+    fn new(program: &'a Program) -> Self {
+        Self { index: 0, program }
+    }
+}
+
+impl<'a> Iterator for KeyActionIterator<'a> {
+    type Item = (Key, Action);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.program.program.len() {
+            let key: Key = self.index.into();
+            let action = self.program.get(&key);
+            self.index += 1;
+            action.map(|a| (key, *a))
+        } else {
+            None
+        }
+    }
 }
 
 pub struct Programs {
@@ -248,6 +284,44 @@ mod tests {
         );
 
         assert_eq!(Ok(expected), "1R1 0R1 1L1 1R2".parse())
+    }
+
+    #[test]
+    fn key_action_iterator_can_be_iterated() {
+        let program: Program = "1R0 0R0".parse().unwrap();
+        let expected: Vec<(Key, Action)> = vec![
+            (
+                (State::Number(0), Symbol::Blank).into(),
+                (Symbol::NonBlank, Direction::Right, State::Number(0)).into(),
+            ),
+            (
+                (State::Number(0), Symbol::NonBlank).into(),
+                (Symbol::Blank, Direction::Right, State::Number(0)).into(),
+            ),
+        ];
+
+        let actual: Vec<(Key, Action)> = KeyActionIterator::new(&program).collect();
+
+        assert_eq!(expected, actual)
+    }
+
+    #[test]
+    fn program_can_be_iterated() {
+        let program: Program = "1R0 0R0".parse().unwrap();
+        let expected: Vec<(Key, Action)> = vec![
+            (
+                (State::Number(0), Symbol::Blank).into(),
+                (Symbol::NonBlank, Direction::Right, State::Number(0)).into(),
+            ),
+            (
+                (State::Number(0), Symbol::NonBlank).into(),
+                (Symbol::Blank, Direction::Right, State::Number(0)).into(),
+            ),
+        ];
+
+        let actual: Vec<(Key, Action)> = program.into_iter().collect();
+
+        assert_eq!(expected, actual)
     }
 
     #[test]
