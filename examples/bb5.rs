@@ -1,8 +1,8 @@
-use busy_beaver::turing::{Machine, Program};
+use busy_beaver::turing::{Machine, NaiveProgram};
 use std::time::Instant;
 
 fn main() {
-    let program: Program = "1R1 1L2 1R2 1R1 1R3 0L4 1L0 1L3 1RH 0L0".parse().unwrap();
+    let program: NaiveProgram = "1R1 1L2 1R2 1R1 1R3 0L4 1L0 1L3 1RH 0L0".parse().unwrap();
     let mut machine = Machine::new(program);
 
     let start = Instant::now();

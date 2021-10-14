@@ -1,7 +1,9 @@
 use super::action;
 use super::action::{Action, Actions};
-use cartesian::*;
 use super::{Key, Keys};
+use super::{Lookup, Program};
+use cartesian::*;
+use std::convert::Into;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::iter::IntoIterator;
@@ -10,6 +12,15 @@ use std::str::FromStr;
 #[derive(Debug, PartialEq, Eq)]
 pub struct NaiveProgram {
     program: Vec<Action>,
+}
+
+impl Program for NaiveProgram {
+    fn lookup(&self, key: &Key) -> Lookup {
+        match self.program.get(key.idx()) {
+            Some(action) => Lookup::Determined(*action),
+            None => Lookup::Indeterminate,
+        }
+    }
 }
 
 impl NaiveProgram {
@@ -27,10 +38,6 @@ impl NaiveProgram {
         let key = key.into();
         self.program.insert(key.idx(), action.into());
     }
-
-    pub fn get(&self, key: &Key) -> Option<&Action> {
-        self.program.get(key.idx())
-    }
 }
 
 impl Default for NaiveProgram {
@@ -43,8 +50,9 @@ impl Display for NaiveProgram {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let n = (self.program.len() / 2) as u8; // We assume only complete programs
         let actions: Vec<String> = Keys::up_to(n)
-            .map(|k| self.get(&k))
-            .map(|ao| {
+            .map(|k| self.lookup(&k))
+            .map(|l| {
+                let ao: Option<Action> = l.into();
                 ao.map(|a| a.to_string())
                     .unwrap_or_else(|| "???".to_string())
             })
@@ -122,9 +130,10 @@ impl<'a> Iterator for KeyActionIterator<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.program.program.len() {
             let key: Key = self.index.into();
-            let action = self.program.get(&key);
+            let lookup = self.program.lookup(&key);
             self.index += 1;
-            action.map(|a| (key, *a))
+            let action: Option<Action> = lookup.into();
+            action.map(|a| (key, a))
         } else {
             None
         }

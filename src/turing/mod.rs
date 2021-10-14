@@ -5,7 +5,9 @@ mod symbol;
 mod tape;
 
 pub use direction::{Direction, Directions};
-pub use program::{Action, Actions, Key, Keys, NaiveProgram as Program, NaivePrograms as Programs};
+pub use program::{
+    Action, Actions, Key, Keys, Lookup, NaiveProgram, NaivePrograms as Programs, Program,
+};
 pub use state::{State, States};
 pub use symbol::{Symbol, Symbols};
 pub use tape::{move_to, Head, Tape};
@@ -13,12 +15,12 @@ pub use tape::{move_to, Head, Tape};
 pub struct Machine {
     head: Head,
     tape: Tape,
-    program: Program,
+    program: NaiveProgram,
     state: State,
 }
 
 impl Machine {
-    pub fn new(program: Program) -> Self {
+    pub fn new(program: NaiveProgram) -> Self {
         Self {
             head: 0i128,
             tape: Tape::empty(),
@@ -27,7 +29,7 @@ impl Machine {
         }
     }
 
-    pub fn with_state(state: State, program: Program) -> Self {
+    pub fn with_state(state: State, program: NaiveProgram) -> Self {
         Self {
             head: 0i128,
             tape: Tape::empty(),
@@ -42,17 +44,18 @@ impl Machine {
                 state: self.state,
                 symbol: self.tape[self.head],
             };
-            match self.program.get(&key) {
-                None => self.state = State::Stuck,
-                Some(Action::Halt) => self.state = State::Halted,
-                Some(Action::Do {
+            match self.program.lookup(&key) {
+                Lookup::Unknown => self.state = State::Stuck,
+                Lookup::Indeterminate => self.state = State::Stuck,
+                Lookup::Determined(Action::Halt) => self.state = State::Halted,
+                Lookup::Determined(Action::Do {
                     symbol,
                     direction,
                     state,
                 }) => {
-                    self.tape[self.head] = *symbol;
-                    self.head = move_to(direction, &self.head);
-                    self.state = *state;
+                    self.tape[self.head] = symbol;
+                    self.head = move_to(&direction, &self.head);
+                    self.state = state;
                 }
             }
         }
@@ -93,7 +96,7 @@ mod tests {
 
     #[test]
     fn a_simple_machine_can_be_run() {
-        let mut program: Program = Program::new();
+        let mut program: NaiveProgram = NaiveProgram::new();
         program.insert(
             (State::Number(0), Symbol::Blank),
             (Symbol::NonBlank, Direction::Right, State::Number(1)),
