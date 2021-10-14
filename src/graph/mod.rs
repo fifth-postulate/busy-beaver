@@ -48,6 +48,6 @@ mod test {
         writer.write(&program).unwrap();
 
         let graph = String::from_utf8(output);
-        assert_eq!(graph, Ok("digraph {\n  0 -> 1 [label=\"1\"];\n  0 -> 1 [label=\"0\"];\n  1 -> 0 [label=\"1\"];\n  1 -> 0 [label=\"1\"];\n}\n".to_owned()))
+        assert_eq!(graph, Ok("digraph {\n  0 -> 1 [label=\"0\"];\n  0 -> 1 [label=\"1\"];\n  1 -> 0 [label=\"0\"];\n  1 -> 0 [label=\"1\"];\n}\n".to_owned()))
     }
 }
