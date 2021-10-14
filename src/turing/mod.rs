@@ -12,15 +12,15 @@ pub use state::{State, States};
 pub use symbol::{Symbol, Symbols};
 pub use tape::{move_to, Head, Tape};
 
-pub struct Machine {
+pub struct Machine<'a> {
     head: Head,
     tape: Tape,
-    program: NaiveProgram,
+    program: &'a dyn Program,
     state: State,
 }
 
-impl Machine {
-    pub fn new(program: NaiveProgram) -> Self {
+impl<'a> Machine<'a> {
+    pub fn new(program: &'a dyn Program) -> Self {
         Self {
             head: 0i128,
             tape: Tape::empty(),
@@ -29,7 +29,7 @@ impl Machine {
         }
     }
 
-    pub fn with_state(state: State, program: NaiveProgram) -> Self {
+    pub fn with_state(state: State, program: &'a dyn Program) -> Self {
         Self {
             head: 0i128,
             tape: Tape::empty(),
@@ -114,7 +114,7 @@ mod tests {
             (Symbol::NonBlank, Direction::Right, State::Halted),
         );
         let start = State::Number(0);
-        let mut machine = Machine::with_state(start, program);
+        let mut machine = Machine::with_state(start, &program);
 
         let steps = machine.run(10);
 

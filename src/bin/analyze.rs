@@ -17,7 +17,7 @@ fn main() {
     let start = Instant::now();
     for program in Programs::all(n) {
         print!(".");
-        let mut machine = Machine::new(program);
+        let mut machine = Machine::new(&program);
         let assessment = machine.run(maximum);
         report.update_with(&assessment);
     }
