@@ -1,5 +1,5 @@
-use busy_beaver::turing::Program;
 use busy_beaver::graph::GraphWriter;
+use busy_beaver::turing::Program;
 use std::env;
 use std::fmt::Result;
 

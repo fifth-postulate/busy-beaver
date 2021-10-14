@@ -1,5 +1,6 @@
 use busy_beaver::turing::{Assessment, Details, Machine, Programs};
 use std::env;
+use std::time::Instant;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -13,13 +14,19 @@ fn main() {
         .unwrap_or(10_000);
 
     let mut report = Report::new();
+    let start = Instant::now();
     for program in Programs::all(n) {
         print!(".");
         let mut machine = Machine::new(program);
         let assessment = machine.run(maximum);
         report.update_with(&assessment);
     }
-    println!("\nn={}, maximum={}: {:?}", n, maximum, report);
+    let duration = start.elapsed();
+
+    println!(
+        "\nn={}, maximum={}, duration={:?}: {:?}",
+        n, maximum, duration, report
+    );
 }
 
 #[derive(Debug, PartialEq, Eq)]
