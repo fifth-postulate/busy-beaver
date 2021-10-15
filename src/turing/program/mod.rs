@@ -1,10 +1,10 @@
 mod action;
 mod key;
-mod naive;
+mod complete;
 
 pub use action::{Action, Actions};
 pub use key::{Key, Keys};
-pub use naive::{NaiveProgram, NaivePrograms};
+pub use complete::{CompleteProgram, CompletePrograms};
 use std::convert::From;
 
 pub trait Program {

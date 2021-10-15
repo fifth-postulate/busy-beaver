@@ -1,4 +1,4 @@
-use crate::turing::{Action, NaiveProgram};
+use crate::turing::{Action, CompleteProgram};
 use dot_writer::{Attributes, DotWriter};
 use std::fmt::{Result, Write as FmtWrite};
 use std::io::Write;
@@ -12,7 +12,7 @@ impl<'a> GraphWriter<'a> {
         Self { output }
     }
 
-    pub fn write(&mut self, program: &NaiveProgram) -> Result {
+    pub fn write(&mut self, program: &CompleteProgram) -> Result {
         let mut writer = DotWriter::from(&mut self.output);
         let mut digraph = writer.digraph();
         for (key, action) in program {
@@ -44,7 +44,7 @@ mod test {
         let mut output: Vec<u8> = Vec::new();
         let mut writer = GraphWriter::new(&mut output);
 
-        let program: NaiveProgram = "1L1 0R1 1L0 1R0".parse().unwrap();
+        let program: CompleteProgram = "1L1 0R1 1L0 1R0".parse().unwrap();
         writer.write(&program).unwrap();
 
         let graph = String::from_utf8(output);

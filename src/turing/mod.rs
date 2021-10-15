@@ -6,7 +6,7 @@ mod tape;
 
 pub use direction::{Direction, Directions};
 pub use program::{
-    Action, Actions, Key, Keys, Lookup, NaiveProgram, NaivePrograms as Programs, Program,
+    Action, Actions, Key, Keys, Lookup, CompleteProgram, CompletePrograms as Programs, Program,
 };
 pub use state::{State, States};
 pub use symbol::{Symbol, Symbols};
@@ -96,7 +96,7 @@ mod tests {
 
     #[test]
     fn a_simple_machine_can_be_run() {
-        let mut program: NaiveProgram = NaiveProgram::new();
+        let mut program = CompleteProgram::new();
         program.insert(
             (State::Number(0), Symbol::Blank),
             (Symbol::NonBlank, Direction::Right, State::Number(1)),

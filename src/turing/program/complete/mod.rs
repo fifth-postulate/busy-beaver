@@ -10,11 +10,11 @@ use std::iter::IntoIterator;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct NaiveProgram {
+pub struct CompleteProgram {
     program: Vec<Action>,
 }
 
-impl Program for NaiveProgram {
+impl Program for CompleteProgram {
     fn lookup(&self, key: &Key) -> Lookup {
         match self.program.get(key.idx()) {
             Some(action) => Lookup::Determined(*action),
@@ -23,7 +23,7 @@ impl Program for NaiveProgram {
     }
 }
 
-impl NaiveProgram {
+impl CompleteProgram {
     pub fn new() -> Self {
         Self {
             program: Vec::new(),
@@ -40,13 +40,13 @@ impl NaiveProgram {
     }
 }
 
-impl Default for NaiveProgram {
+impl Default for CompleteProgram {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl Display for NaiveProgram {
+impl Display for CompleteProgram {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let n = (self.program.len() / 2) as u8; // We assume only complete programs
         let actions: Vec<String> = Keys::up_to(n)
@@ -61,12 +61,12 @@ impl Display for NaiveProgram {
     }
 }
 
-impl FromStr for NaiveProgram {
+impl FromStr for CompleteProgram {
     type Err = ParseError;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         if !input.is_empty() {
-            let mut program = NaiveProgram::new();
+            let mut program = CompleteProgram::new();
             let mut action_index = 0;
             let mut index = 4 * action_index;
             while index < input.len() && (index + 3) <= input.len() {
@@ -106,10 +106,10 @@ pub struct ActionProblemDetail {
 
 pub struct KeyActionIterator<'a> {
     index: usize,
-    program: &'a NaiveProgram,
+    program: &'a CompleteProgram,
 }
 
-impl<'a> IntoIterator for &'a NaiveProgram {
+impl<'a> IntoIterator for &'a CompleteProgram {
     type Item = (Key, Action);
     type IntoIter = KeyActionIterator<'a>;
 
@@ -119,7 +119,7 @@ impl<'a> IntoIterator for &'a NaiveProgram {
 }
 
 impl<'a> KeyActionIterator<'a> {
-    fn new(program: &'a NaiveProgram) -> Self {
+    fn new(program: &'a CompleteProgram) -> Self {
         Self { index: 0, program }
     }
 }
@@ -140,8 +140,8 @@ impl<'a> Iterator for KeyActionIterator<'a> {
     }
 }
 
-pub struct NaivePrograms {
-    iterator: Box<dyn Iterator<Item = NaiveProgram>>,
+pub struct CompletePrograms {
+    iterator: Box<dyn Iterator<Item = CompleteProgram>>,
 }
 
 macro_rules! actions {
@@ -223,15 +223,15 @@ macro_rules! tuple {
 
 macro_rules! all_programs {
     ($n:tt, $fname:ident) => {
-        fn $fname() -> NaivePrograms {
+        fn $fname() -> CompletePrograms {
             let iterator = actions!($n).map(tuple!($n)).map(|actions| {
-                let mut program = NaiveProgram::new();
+                let mut program = CompleteProgram::new();
                 for (key, action) in Keys::up_to($n).zip(actions) {
                     program.insert(key, action);
                 }
                 program
             });
-            NaivePrograms {
+            CompletePrograms {
                 iterator: Box::new(iterator),
             }
         }
@@ -244,7 +244,7 @@ all_programs!(3, all3);
 all_programs!(4, all4);
 all_programs!(5, all5);
 
-impl NaivePrograms {
+impl CompletePrograms {
     pub fn all(n: u8) -> Self {
         match n {
             1 => all1(),
@@ -257,8 +257,8 @@ impl NaivePrograms {
     }
 }
 
-impl Iterator for NaivePrograms {
-    type Item = NaiveProgram;
+impl Iterator for CompletePrograms {
+    type Item = CompleteProgram;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.iterator.next()
@@ -272,7 +272,7 @@ mod tests {
 
     #[test]
     fn programs_can_be_parsed() {
-        let mut expected = NaiveProgram::new();
+        let mut expected = CompleteProgram::new();
         expected.insert(
             (State::Number(0), Symbol::Blank),
             (Symbol::NonBlank, Direction::Right, State::Number(1)),
@@ -295,7 +295,7 @@ mod tests {
 
     #[test]
     fn key_action_iterator_can_be_iterated() {
-        let program: NaiveProgram = "1R0 0R0".parse().unwrap();
+        let program: CompleteProgram = "1R0 0R0".parse().unwrap();
         let expected: Vec<(Key, Action)> = vec![
             (
                 (State::Number(0), Symbol::Blank).into(),
@@ -314,7 +314,7 @@ mod tests {
 
     #[test]
     fn program_can_be_iterated() {
-        let program: NaiveProgram = "1R0 0R0".parse().unwrap();
+        let program: CompleteProgram = "1R0 0R0".parse().unwrap();
         let expected: Vec<(Key, Action)> = vec![
             (
                 (State::Number(0), Symbol::Blank).into(),
