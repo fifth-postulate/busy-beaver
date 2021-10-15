@@ -10,10 +10,9 @@ pub use program::{
 };
 pub use state::{State, States};
 pub use symbol::{Symbol, Symbols};
-pub use tape::{move_to, Head, Tape};
+pub use tape::{Tape};
 
 pub struct Machine<'a> {
-    head: Head,
     tape: Tape,
     program: &'a dyn Program,
     state: State,
@@ -22,7 +21,6 @@ pub struct Machine<'a> {
 impl<'a> Machine<'a> {
     pub fn new(program: &'a dyn Program) -> Self {
         Self {
-            head: 0i128,
             tape: Tape::empty(),
             state: State::Number(0),
             program,
@@ -31,7 +29,6 @@ impl<'a> Machine<'a> {
 
     pub fn with_state(state: State, program: &'a dyn Program) -> Self {
         Self {
-            head: 0i128,
             tape: Tape::empty(),
             program,
             state,
@@ -42,7 +39,7 @@ impl<'a> Machine<'a> {
         if !self.state.halted() {
             let key = Key {
                 state: self.state,
-                symbol: self.tape[self.head],
+                symbol: *self.tape.read(),
             };
             match self.program.lookup(&key) {
                 Lookup::Unknown => self.state = State::Stuck,
@@ -53,8 +50,8 @@ impl<'a> Machine<'a> {
                     direction,
                     state,
                 }) => {
-                    self.tape[self.head] = symbol;
-                    self.head = move_to(&direction, &self.head);
+                    self.tape.write(symbol);
+                    self.tape.move_to(&direction);
                     self.state = state;
                 }
             }
