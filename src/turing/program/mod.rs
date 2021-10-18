@@ -1,10 +1,10 @@
 mod action;
-mod key;
 mod complete;
+mod key;
 
 pub use action::{Action, Actions};
-pub use key::{Key, Keys};
 pub use complete::{CompleteProgram, CompletePrograms};
+pub use key::{Key, Keys};
 use std::convert::From;
 
 pub trait Program {

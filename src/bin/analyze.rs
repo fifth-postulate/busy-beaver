@@ -34,6 +34,7 @@ struct Report {
     total: usize,
     halted: usize,
     indeterminate: usize,
+    stuck: usize,
     sigma_champion: Option<Champion>,
     s_champion: Option<Champion>,
 }
@@ -65,6 +66,7 @@ impl Report {
             total: 0,
             halted: 0,
             indeterminate: 0,
+            stuck: 0,
             s_champion: None,
             sigma_champion: None,
         }
@@ -101,6 +103,9 @@ impl Report {
                         self.s_champion = Some(Champion::new(*details));
                     }
                 };
+            }
+            Assessment::NoProgress(_reason) => {
+                self.stuck += 1;
             }
             Assessment::NotHalted => {
                 self.indeterminate += 1;

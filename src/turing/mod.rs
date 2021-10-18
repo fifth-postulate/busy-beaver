@@ -6,11 +6,11 @@ mod tape;
 
 pub use direction::{Direction, Directions};
 pub use program::{
-    Action, Actions, Key, Keys, Lookup, CompleteProgram, CompletePrograms as Programs, Program,
+    Action, Actions, CompleteProgram, CompletePrograms as Programs, Key, Keys, Lookup, Program,
 };
 pub use state::{State, States};
 pub use symbol::{Symbol, Symbols};
-pub use tape::{Tape};
+pub use tape::Tape;
 
 pub struct Machine<'a> {
     tape: Tape,
@@ -35,16 +35,19 @@ impl<'a> Machine<'a> {
         }
     }
 
-    fn step(&mut self) {
+    fn step(&mut self) -> Progress {
         if !self.state.halted() {
             let key = Key {
                 state: self.state,
                 symbol: *self.tape.read(),
             };
             match self.program.lookup(&key) {
-                Lookup::Unknown => self.state = State::Stuck,
-                Lookup::Indeterminate => self.state = State::Stuck,
-                Lookup::Determined(Action::Halt) => self.state = State::Halted,
+                Lookup::Unknown => Progress::Stuck,
+                Lookup::Indeterminate => Progress::Limbo,
+                Lookup::Determined(Action::Halt) => {
+                    self.state = State::Halted;
+                    Progress::Made
+                }
                 Lookup::Determined(Action::Do {
                     symbol,
                     direction,
@@ -53,16 +56,23 @@ impl<'a> Machine<'a> {
                     self.tape.write(symbol);
                     self.tape.move_to(&direction);
                     self.state = state;
+                    Progress::Made
                 }
             }
+        } else {
+            Progress::Halted
         }
     }
 
     pub fn run(&mut self, maximum_steps: u128) -> Assessment {
         let mut steps_taken: u128 = 0u128;
         while !self.state.halted() && steps_taken < maximum_steps {
-            self.step();
-            steps_taken += 1;
+            let progress = self.step();
+            if matches!(progress, Progress::Made) {
+                steps_taken += 1;
+            } else {
+                return Assessment::NoProgress(progress);
+            }
         }
         if self.state.halted() {
             Assessment::HaltedIn(Details {
@@ -76,7 +86,16 @@ impl<'a> Machine<'a> {
 }
 
 #[derive(Debug, PartialEq, Eq)]
+pub enum Progress {
+    Halted,
+    Stuck,
+    Limbo,
+    Made,
+}
+
+#[derive(Debug, PartialEq, Eq)]
 pub enum Assessment {
+    NoProgress(Progress),
     HaltedIn(Details),
     NotHalted,
 }

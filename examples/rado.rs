@@ -1,4 +1,4 @@
-use busy_beaver::turing::{Machine, CompleteProgram};
+use busy_beaver::turing::{CompleteProgram, Machine};
 use std::time::Instant;
 
 fn main() {
