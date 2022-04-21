@@ -32,21 +32,31 @@ impl Tape {
 
     pub fn read(&self) -> &Symbol {
         if self.head >= 0i128 {
-            self.right.get(self.head as usize).unwrap_or_default()
+            self.right.get(self.right_index()).unwrap_or_default()
         } else {
-            self.left.get((-self.head - 1) as usize).unwrap_or_default()
+            self.left.get(self.left_index()).unwrap_or_default()
         }
+    }
+
+    fn right_index(&self) -> usize {
+        assert!(self.head >= 0i128);
+        self.head as usize
+    }
+
+    fn left_index(&self) -> usize {
+        assert!(self.head < 0i128);
+        (-self.head - 1) as usize
     }
 
     pub fn write(&mut self, symbol: Symbol) {
         if self.head >= 0i128 {
-            let i = self.head as usize;
+            let i = self.right_index();
             if i >= self.right.len() {
                 self.right.insert(i, Symbol::Blank)
             }
             self.right[i] = symbol;
         } else {
-            let i = (-self.head - 1) as usize;
+            let i = self.left_index();
             if i >= self.left.len() {
                 self.left.insert(i, Symbol::Blank)
             }

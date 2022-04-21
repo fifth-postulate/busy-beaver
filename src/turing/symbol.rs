@@ -91,7 +91,7 @@ mod tests {
     }
 
     #[test]
-    fn distinct_symbols_are_distinct() {
+    fn distinct_symbols_are_non_equal() {
         assert_ne!(Symbol::Blank, Symbol::NonBlank);
         assert_ne!(Symbol::NonBlank, Symbol::Blank);
     }

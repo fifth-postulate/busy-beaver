@@ -6,7 +6,8 @@ mod tape;
 
 pub use direction::{Direction, Directions};
 pub use program::{
-    Action, Actions, CompleteProgram, CompletePrograms as Programs, Key, Keys, Lookup, Program,
+    Action, Actions, CompleteProgram, CompletePrograms as Programs, IncompleteProgram, Key, Keys,
+    Lookup, Program,
 };
 pub use state::{State, States};
 pub use symbol::{Symbol, Symbols};
@@ -35,7 +36,15 @@ impl<'a> Machine<'a> {
         }
     }
 
-    fn step(&mut self) -> Progress {
+    pub fn with(tape: Tape, state: State, program: &'a dyn Program) -> Self {
+        Self {
+            tape,
+            state,
+            program,
+        }
+    }
+
+    pub fn step(&mut self) -> Progress {
         if !self.state.halted() {
             let key = Key {
                 state: self.state,
@@ -77,11 +86,15 @@ impl<'a> Machine<'a> {
         if self.state.halted() {
             Assessment::HaltedIn(Details {
                 steps: steps_taken,
-                score: self.tape.count(&Symbol::NonBlank),
+                score: self.score(),
             })
         } else {
             Assessment::NotHalted
         }
+    }
+
+    pub fn score(&self) -> usize {
+        self.tape.count(&Symbol::NonBlank)
     }
 }
 

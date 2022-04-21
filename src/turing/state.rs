@@ -40,7 +40,7 @@ impl FromStr for State {
                 let index = input.parse::<u8>();
                 index
                     .map(State::Number)
-                    .map_err(|_e| ParseError::UnknownSymbol(input.to_owned()))
+                    .map_err(|_e| ParseError::UnknownState(input.to_owned()))
             }
         }
     }
@@ -48,7 +48,7 @@ impl FromStr for State {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum ParseError {
-    UnknownSymbol(String),
+    UnknownState(String),
 }
 
 pub struct States {
@@ -109,14 +109,16 @@ mod tests {
     }
 
     #[test]
-    fn distinct_states_are_distinct() {
+    fn distinct_states_are_not_equal() {
         assert_ne!(State::Halted, State::Number(0u8));
         assert_ne!(State::Number(0u8), State::Halted);
+        assert_ne!(State::Number(0u8), State::Number(1u8));
     }
 
     #[test]
-    fn halted_and_stuck_are_halted_states() {
+    fn halted_is_the_only_halted_states() {
         assert!(State::Halted.halted());
+        assert!(!State::Number(0u8).halted());
     }
 
     #[test]
@@ -137,7 +139,7 @@ mod tests {
     }
 
     #[test]
-    fn non_halted_state_contain_all_non_halted_states_up_to_argument() {
+    fn non_halted_states_contain_all_non_halted_states_up_to_argument() {
         let actual: Vec<State> = States::non_halted_up_to(3).collect();
 
         assert_eq!(

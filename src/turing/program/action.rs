@@ -148,7 +148,7 @@ mod tests {
             "0H1".parse::<Action>()
         );
         assert_eq!(
-            Err(ParseError::StateProblem(state::ParseError::UnknownSymbol(
+            Err(ParseError::StateProblem(state::ParseError::UnknownState(
                 "a".to_owned()
             ))),
             "0La".parse::<Action>()

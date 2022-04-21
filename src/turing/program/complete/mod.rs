@@ -18,7 +18,7 @@ impl Program for CompleteProgram {
     fn lookup(&self, key: &Key) -> Lookup {
         match self.program.get(key.idx()) {
             Some(action) => Lookup::Determined(*action),
-            None => Lookup::Indeterminate,
+            None => Lookup::Unknown,
         }
     }
 }

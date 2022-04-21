@@ -70,7 +70,7 @@ mod tests {
     }
 
     #[test]
-    fn distinct_direction_are_distinct() {
+    fn distinct_direction_are_not_equal() {
         assert_ne!(Direction::Left, Direction::Right);
         assert_ne!(Direction::Right, Direction::Left);
     }
