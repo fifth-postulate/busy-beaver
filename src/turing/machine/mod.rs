@@ -11,6 +11,12 @@ pub struct Machine<'a> {
     state: State,
 }
 
+impl<'a> From<Machine<'a>> for (Tape, State, &'a dyn Program) {
+    fn from(machine: Machine<'a>) -> Self {
+        (machine.tape, machine.state, machine.program)
+    }
+}
+
 impl<'a> Machine<'a> {
     pub fn new(program: &'a dyn Program) -> Self {
         Self {

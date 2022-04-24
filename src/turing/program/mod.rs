@@ -1,9 +1,11 @@
 mod action;
 mod complete;
+mod incomplete;
 mod key;
 
 pub use action::{Action, Actions};
 pub use complete::{CompleteProgram, CompletePrograms};
+pub use incomplete::IncompleteProgram;
 pub use key::{Key, Keys};
 use std::convert::From;
 

@@ -10,8 +10,8 @@ pub struct Tape {
 pub type Head = i128;
 
 impl Tape {
-    pub fn empty() -> Tape {
-        Tape {
+    pub fn empty() -> Self {
+        Self {
             head: 0,
             right: Vec::new(),
             left: Vec::new(),
@@ -61,6 +61,18 @@ impl Tape {
                 self.left.insert(i, Symbol::Blank)
             }
             self.left[i] = symbol
+        }
+    }
+}
+
+impl Clone for Tape {
+    fn clone(&self) -> Self {
+        let left = self.left.to_vec();
+        let right = self.right.to_vec();
+        Self {
+            head: self.head,
+            left,
+            right,
         }
     }
 }
