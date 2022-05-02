@@ -1,5 +1,5 @@
 use busy_beaver::turing::{
-    Assessment, Details, IncompleteProgram, Machine, Program, Progress, State, Tape,
+    Assessment, Details, IncompleteProgram, Key, Machine, Program, Progress, State, Tape,
 };
 use std::env;
 use std::time::Instant;
@@ -24,6 +24,7 @@ fn main() {
     )];
     let start = Instant::now();
     while let Some((steps_taken, tape, state, program)) = candidates.pop() {
+        println!("{}", program);
         let mut step_count = steps_taken;
         let mut machine: Machine = Machine::with(tape, state, &program);
         loop {
@@ -31,23 +32,24 @@ fn main() {
 
             match progress {
                 Progress::Made => {
-                    print!("·");
+                    //print!("·");
                     step_count += 1;
                     if step_count >= maximum {
                         break;
                     }
                 }
                 Progress::Halted => {
-                    print!("⊞");
+                    //print!("⊞");
                     let details = Details {
                         steps: step_count,
                         score: machine.score(),
                     };
                     report.halted(details);
+                    break;
                 }
                 Progress::Limbo => {
                     let (t, s, _): (Tape, State, &dyn Program) = machine.into();
-                    for p in program.extentions() {
+                    for p in program.extentions((s, *t.read())) {
                         candidates.push((step_count, t.clone(), s, p));
                     }
                     break;

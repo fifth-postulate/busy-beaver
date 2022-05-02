@@ -1,27 +1,21 @@
-use super::{Key, Keys};
-use super::{Lookup, Program};
-use crate::turing::Action;
-use std::fmt;
-use std::fmt::{Display, Formatter};
+use super::{Key, Keys, Lookup, Program};
+use crate::turing::{Action, Actions};
+use std::cmp::min;
+use std::fmt::{self, Display, Formatter};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct IncompleteProgram {
     n: u8,
-    program: Vec<Action>,
+    program: Vec<Option<Action>>,
 }
 
 impl Program for IncompleteProgram {
     fn lookup(&self, key: &Key) -> Lookup {
         let idx = key.idx();
         match self.program.get(idx) {
-            Some(action) => Lookup::Determined(*action),
-            None => {
-                if idx < (2 * self.n).into() {
-                    Lookup::Indeterminate
-                } else {
-                    Lookup::Unknown
-                }
-            }
+            Some(Some(action)) => Lookup::Determined(*action),
+            Some(None) => Lookup::Indeterminate,
+            None => Lookup::Unknown,
         }
     }
 }
@@ -30,7 +24,7 @@ impl IncompleteProgram {
     pub fn with_states(n: u8) -> Self {
         Self {
             n,
-            program: Vec::new(),
+            program: vec![None; 2*n as usize],
         }
     }
 
@@ -40,11 +34,14 @@ impl IncompleteProgram {
         A: Into<Action>,
     {
         let key = key.into();
-        self.program.insert(key.idx(), action.into());
+        self.program[key.idx()] = Some(action.into());
     }
 
-    pub fn extentions(&self) -> Extention {
-        Extention::of(self.clone())
+    pub fn extentions<K>(&self, key: K) -> Extentions
+    where
+        K: Into<Key>,
+    {
+        Extentions::of(self.clone(), key.into())
     }
 }
 
@@ -54,7 +51,10 @@ impl Clone for IncompleteProgram {
         self.program
             .iter()
             .enumerate()
-            .for_each(|(index, action)| program.insert(index, *action));
+            .filter(|(_, action)| action.is_some())
+            .for_each(|(index, action)| {
+                program.insert(index, action.unwrap())
+            });
 
         program
     }
@@ -74,21 +74,32 @@ impl Display for IncompleteProgram {
     }
 }
 
-pub struct Extention {
-    start: IncompleteProgram,
+pub struct Extentions {
+    key: Key,
+    program: IncompleteProgram,
+    iterator: Box<dyn Iterator<Item = Action>>,
 }
 
-impl Extention {
-    fn of(program: IncompleteProgram) -> Self {
-        Self { start: program }
+impl Extentions {
+    fn of(program: IncompleteProgram, key: Key) -> Self {
+        let number_of_states = min(program.n, 2); // TODO correct number
+        let iterator = Actions::up_to(number_of_states);
+        Self {
+            key: key,
+            program: program,
+            iterator: Box::new(iterator),
+        }
     }
 }
 
-impl Iterator for Extention {
+impl Iterator for Extentions {
     type Item = IncompleteProgram;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let program = self.start.clone();
-        None // TODO iterate over all extentions
+        let mut program = self.program.clone();
+        self.iterator.next().map(move |action| {
+            program.insert(self.key, action);
+            program
+        })
     }
 }
