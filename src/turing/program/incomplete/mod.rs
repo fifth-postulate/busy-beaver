@@ -18,13 +18,21 @@ impl Program for IncompleteProgram {
             None => Lookup::Unknown,
         }
     }
+
+    fn multiplicity(&self) -> usize {
+        self.program
+            .iter()
+            .filter(|action| action.is_none())
+            .map(|_| (4 * self.n + 1) as usize)
+            .product()
+    }
 }
 
 impl IncompleteProgram {
     pub fn with_states(n: u8) -> Self {
         Self {
             n,
-            program: vec![None; 2*n as usize],
+            program: vec![None; 2 * n as usize],
         }
     }
 
@@ -52,9 +60,7 @@ impl Clone for IncompleteProgram {
             .iter()
             .enumerate()
             .filter(|(_, action)| action.is_some())
-            .for_each(|(index, action)| {
-                program.insert(index, action.unwrap())
-            });
+            .for_each(|(index, action)| program.insert(index, action.unwrap()));
 
         program
     }

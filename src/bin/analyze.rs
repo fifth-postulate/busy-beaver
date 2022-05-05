@@ -39,27 +39,6 @@ struct Report {
     s_champion: Option<Champion>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
-struct Champion {
-    details: Details,
-    count: usize,
-}
-
-impl Champion {
-    fn new(details: Details) -> Self {
-        Self { details, count: 1 }
-    }
-
-    fn update(&mut self, details: Details) {
-        self.details = details;
-        self.count = 1;
-    }
-
-    fn tally(&mut self) {
-        self.count += 1;
-    }
-}
-
 impl Report {
     fn new() -> Self {
         Self {
@@ -111,5 +90,26 @@ impl Report {
                 self.indeterminate += 1;
             }
         };
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct Champion {
+    details: Details,
+    count: usize,
+}
+
+impl Champion {
+    fn new(details: Details) -> Self {
+        Self { details, count: 1 }
+    }
+
+    fn update(&mut self, details: Details) {
+        self.details = details;
+        self.count = 1;
+    }
+
+    fn tally(&mut self) {
+        self.count += 1;
     }
 }

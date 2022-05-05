@@ -35,6 +35,7 @@ fn main() {
                     //print!("·");
                     step_count += 1;
                     if step_count >= maximum {
+                        report.indeterminated(program.multiplicity());
                         break;
                     }
                 }
@@ -43,6 +44,7 @@ fn main() {
                     let details = Details {
                         steps: step_count,
                         score: machine.score(),
+                        multiplicity: program.multiplicity(),
                     };
                     report.halted(details);
                     break;
@@ -70,6 +72,7 @@ fn main() {
 
 #[derive(Debug, PartialEq, Eq)]
 struct Report {
+    subjects: usize,
     total: usize,
     halted: usize,
     indeterminate: usize,
@@ -78,30 +81,10 @@ struct Report {
     s_champion: Option<Champion>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
-struct Champion {
-    details: Details,
-    count: usize,
-}
-
-impl Champion {
-    fn new(details: Details) -> Self {
-        Self { details, count: 1 }
-    }
-
-    fn update(&mut self, details: Details) {
-        self.details = details;
-        self.count = 1;
-    }
-
-    fn tally(&mut self) {
-        self.count += 1;
-    }
-}
-
 impl Report {
     fn new() -> Self {
         Self {
+            subjects: 0,
             total: 0,
             halted: 0,
             indeterminate: 0,
@@ -112,9 +95,16 @@ impl Report {
     }
 
     fn halted(&mut self, details: Details) {
-        self.total += 1;
-        self.halted += 1;
+        self.subjects += 1;
+        self.total += details.multiplicity;
+        self.halted += details.multiplicity;
         self.update_champion(details);
+    }
+
+    fn indeterminated(&mut self, multiplicity: usize) {
+        self.subjects += 1;
+        self.total += multiplicity;
+        self.indeterminate += multiplicity;
     }
 
     fn update_champion(&mut self, details: Details) {
@@ -144,5 +134,26 @@ impl Report {
                 self.s_champion = Some(Champion::new(details));
             }
         };
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct Champion {
+    details: Details,
+    count: usize,
+}
+
+impl Champion {
+    fn new(details: Details) -> Self {
+        Self { details, count: 1 }
+    }
+
+    fn update(&mut self, details: Details) {
+        self.details = details;
+        self.count = 1;
+    }
+
+    fn tally(&mut self) {
+        self.count += 1;
     }
 }

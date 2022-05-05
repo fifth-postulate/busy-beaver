@@ -85,6 +85,7 @@ impl<'a> Machine<'a> {
             Assessment::HaltedIn(Details {
                 steps: steps_taken,
                 score: self.score(),
+                multiplicity: self.program.multiplicity(),
             })
         } else {
             Assessment::NotHalted
@@ -115,6 +116,7 @@ pub enum Assessment {
 pub struct Details {
     pub steps: u128,
     pub score: usize,
+    pub multiplicity: usize,
 }
 
 #[cfg(test)]
@@ -146,6 +148,6 @@ mod tests {
 
         let steps = machine.run(10);
 
-        assert_eq!(steps, Assessment::HaltedIn(Details { steps: 3, score: 2 }));
+        assert_eq!(steps, Assessment::HaltedIn(Details { steps: 3, score: 2, multiplicity: 1 }));
     }
 }

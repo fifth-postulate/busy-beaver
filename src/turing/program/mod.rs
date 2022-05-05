@@ -11,6 +11,10 @@ use std::convert::From;
 
 pub trait Program {
     fn lookup(&self, key: &Key) -> Lookup;
+
+    fn multiplicity(&self) -> usize {
+        1
+    }
 }
 
 pub enum Lookup {
