@@ -91,8 +91,8 @@ impl Extentions {
         let number_of_states = min(program.n, 2); // TODO correct number
         let iterator = Actions::up_to(number_of_states);
         Self {
-            key: key,
-            program: program,
+            key,
+            program,
             iterator: Box::new(iterator),
         }
     }

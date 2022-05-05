@@ -78,7 +78,14 @@ impl<'a> Machine<'a> {
             if matches!(progress, Progress::Made) {
                 steps_taken += 1;
             } else {
-                return Assessment::NoProgress(progress);
+                return Assessment::NoProgress(
+                    progress,
+                    Details {
+                        steps: steps_taken,
+                        score: 0,
+                        multiplicity: self.program.multiplicity(),
+                    },
+                );
             }
         }
         if self.state.halted() {
@@ -88,7 +95,11 @@ impl<'a> Machine<'a> {
                 multiplicity: self.program.multiplicity(),
             })
         } else {
-            Assessment::NotHalted
+            Assessment::NotHalted(Details {
+                steps: steps_taken,
+                score: 0,
+                multiplicity: self.program.multiplicity(),
+            })
         }
     }
 
@@ -107,9 +118,9 @@ pub enum Progress {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Assessment {
-    NoProgress(Progress),
+    NoProgress(Progress, Details),
     HaltedIn(Details),
-    NotHalted,
+    NotHalted(Details),
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -148,6 +159,13 @@ mod tests {
 
         let steps = machine.run(10);
 
-        assert_eq!(steps, Assessment::HaltedIn(Details { steps: 3, score: 2, multiplicity: 1 }));
+        assert_eq!(
+            steps,
+            Assessment::HaltedIn(Details {
+                steps: 3,
+                score: 2,
+                multiplicity: 1
+            })
+        );
     }
 }

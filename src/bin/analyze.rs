@@ -1,4 +1,7 @@
-use busy_beaver::turing::{Assessment, Details, Machine, Programs};
+use busy_beaver::{
+    report::Report,
+    turing::{Machine, Programs},
+};
 use std::env;
 use std::time::Instant;
 
@@ -27,89 +30,4 @@ fn main() {
         "\nn={}, maximum={}, duration={:?}: {:?}",
         n, maximum, duration, report
     );
-}
-
-#[derive(Debug, PartialEq, Eq)]
-struct Report {
-    total: usize,
-    halted: usize,
-    indeterminate: usize,
-    stuck: usize,
-    sigma_champion: Option<Champion>,
-    s_champion: Option<Champion>,
-}
-
-impl Report {
-    fn new() -> Self {
-        Self {
-            total: 0,
-            halted: 0,
-            indeterminate: 0,
-            stuck: 0,
-            s_champion: None,
-            sigma_champion: None,
-        }
-    }
-
-    fn update_with(&mut self, assessment: &Assessment) {
-        self.total += 1;
-        match assessment {
-            Assessment::HaltedIn(details) => {
-                self.halted += 1;
-                match &mut self.sigma_champion {
-                    Some(reigning) => {
-                        if details.score > reigning.details.score {
-                            reigning.update(*details);
-                        }
-                        if details.score == reigning.details.score {
-                            reigning.tally();
-                        }
-                    }
-                    None => {
-                        self.sigma_champion = Some(Champion::new(*details));
-                    }
-                };
-                match &mut self.s_champion {
-                    Some(reigning) => {
-                        if details.steps > reigning.details.steps {
-                            reigning.update(*details);
-                        }
-                        if details.steps == reigning.details.steps {
-                            reigning.tally();
-                        }
-                    }
-                    None => {
-                        self.s_champion = Some(Champion::new(*details));
-                    }
-                };
-            }
-            Assessment::NoProgress(_reason) => {
-                self.stuck += 1;
-            }
-            Assessment::NotHalted => {
-                self.indeterminate += 1;
-            }
-        };
-    }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-struct Champion {
-    details: Details,
-    count: usize,
-}
-
-impl Champion {
-    fn new(details: Details) -> Self {
-        Self { details, count: 1 }
-    }
-
-    fn update(&mut self, details: Details) {
-        self.details = details;
-        self.count = 1;
-    }
-
-    fn tally(&mut self) {
-        self.count += 1;
-    }
 }
