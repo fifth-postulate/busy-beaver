@@ -1,5 +1,5 @@
 use super::{Key, Keys, Lookup, Program};
-use crate::turing::{Action, Actions};
+use crate::turing::{Action, Actions, State};
 use std::cmp::min;
 use std::fmt::{self, Display, Formatter};
 
@@ -88,8 +88,20 @@ pub struct Extentions {
 
 impl Extentions {
     fn of(program: IncompleteProgram, key: Key) -> Self {
-        let number_of_states = min(program.n, 2); // TODO correct number
-        let iterator = Actions::up_to(number_of_states);
+        let fresh_state: u8 = program
+            .program
+            .iter()
+            .enumerate()
+            .filter(|(_, action)| action.is_some())
+            .map(|(index, _)| index.into())
+            .map(|state| match state {
+                State::Number(s) => s + 1,
+                State::Halted => 0,
+            })
+            .max()
+            .unwrap_or(0);
+        let states_to_explore = min(program.n, fresh_state + 1);
+        let iterator = Actions::up_to(states_to_explore);
         Self {
             key,
             program,

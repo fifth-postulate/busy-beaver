@@ -26,7 +26,7 @@ fn main() {
     )];
     let start = Instant::now();
     while let Some((steps_taken, tape, state, program)) = candidates.pop() {
-        println!("{}", program);
+        // println!("{}", program);
         let mut step_count = steps_taken;
         let mut machine: Machine = Machine::with(tape, state, &program);
         loop {
@@ -34,7 +34,6 @@ fn main() {
 
             match progress {
                 Progress::Made => {
-                    //print!("·");
                     step_count += 1;
                     if step_count >= maximum {
                         report.indeterminated(Details {
@@ -46,7 +45,7 @@ fn main() {
                     }
                 }
                 Progress::Halted => {
-                    //print!("⊞");
+                    print!(".");
                     let details = Details {
                         steps: step_count,
                         score: machine.score(),
