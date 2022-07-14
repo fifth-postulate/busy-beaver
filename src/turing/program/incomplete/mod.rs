@@ -1,6 +1,6 @@
 use super::{Key, Keys, Lookup, Program};
 use crate::turing::{Action, Actions, State};
-use std::cmp::min;
+use std::cmp::{max, min};
 use std::fmt::{self, Display, Formatter};
 
 #[derive(Debug, PartialEq, Eq)]
@@ -88,20 +88,25 @@ pub struct Extentions {
 
 impl Extentions {
     fn of(program: IncompleteProgram, key: Key) -> Self {
-        let fresh_state: u8 = program
+        let k: u8 = match key.state {
+            State::Number(s) => s,
+            State::Halted => 0, // Does not occur
+        };
+        let seen_state = program
             .program
             .iter()
             .enumerate()
             .filter(|(_, action)| action.is_some())
             .map(|(index, _)| index.into())
             .map(|state| match state {
-                State::Number(s) => s + 1,
-                State::Halted => 0,
+                State::Number(s) => s,
+                State::Halted => 0, // Does not occur
             })
             .max()
-            .unwrap_or(0);
-        let states_to_explore = min(program.n, fresh_state + 1);
-        let iterator = Actions::up_to(states_to_explore);
+            .map(|s| max(s, k))
+            .unwrap_or(k);
+        let states_to_explore = min(program.n - 1, seen_state + 1);
+        let iterator = Actions::up_to(states_to_explore + 1);
         Self {
             key,
             program,
@@ -119,5 +124,49 @@ impl Iterator for Extentions {
             program.insert(self.key, action);
             program
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::turing::{Direction, State, Symbol};
+
+    #[test]
+    fn incomplete_programs_can_be_displayed() {
+        let mut program = IncompleteProgram::with_states(1);
+        program.insert(
+            (State::Number(0), Symbol::Blank),
+            (Symbol::NonBlank, Direction::Right, State::Number(0)),
+        );
+
+        let actual = format!("{}", program);
+
+        assert_eq!("1R0 ???", actual);
+    }
+
+    #[test]
+    fn empty_incomplete_programs_can_be_extended() {
+        let program = IncompleteProgram::with_states(2);
+
+        let actual: Vec<String> = program
+            .extentions((State::Number(0), Symbol::Blank))
+            .map(|p| format!("{}", p))
+            .collect();
+
+        assert_eq!(
+            vec![
+                "  H ??? ??? ???",
+                "0L0 ??? ??? ???",
+                "0R0 ??? ??? ???",
+                "1L0 ??? ??? ???",
+                "1R0 ??? ??? ???",
+                "0L1 ??? ??? ???",
+                "0R1 ??? ??? ???",
+                "1L1 ??? ??? ???",
+                "1R1 ??? ??? ???",
+            ],
+            actual,
+        )
     }
 }

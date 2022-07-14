@@ -26,7 +26,7 @@ fn main() {
     )];
     let start = Instant::now();
     while let Some((steps_taken, tape, state, program)) = candidates.pop() {
-        // println!("{}", program);
+        print!(".");
         let mut step_count = steps_taken;
         let mut machine: Machine = Machine::with(tape, state, &program);
         loop {
@@ -45,7 +45,6 @@ fn main() {
                     }
                 }
                 Progress::Halted => {
-                    print!(".");
                     let details = Details {
                         steps: step_count,
                         score: machine.score(),

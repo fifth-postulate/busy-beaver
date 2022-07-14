@@ -122,9 +122,9 @@ mod tests {
             Ok(Action::Do {
                 symbol: Symbol::Blank,
                 direction: Direction::Left,
-                state: State::Number(1)
+                state: State::Number(2)
             }),
-            "0L1".parse()
+            "0L2".parse()
         );
     }
 
@@ -157,7 +157,7 @@ mod tests {
 
     #[test]
     fn actions_up_to_contain_all_actions_up_to_maximum() {
-        let actual: Vec<Action> = Actions::up_to(1).collect();
+        let actual: Vec<Action> = Actions::up_to(2).collect();
 
         assert_eq!(
             vec![
@@ -166,6 +166,10 @@ mod tests {
                 (Symbol::Blank, Direction::Right, State::Number(0)).into(),
                 (Symbol::NonBlank, Direction::Left, State::Number(0)).into(),
                 (Symbol::NonBlank, Direction::Right, State::Number(0)).into(),
+                (Symbol::Blank, Direction::Left, State::Number(1)).into(),
+                (Symbol::Blank, Direction::Right, State::Number(1)).into(),
+                (Symbol::NonBlank, Direction::Left, State::Number(1)).into(),
+                (Symbol::NonBlank, Direction::Right, State::Number(1)).into(),
             ],
             actual
         )
