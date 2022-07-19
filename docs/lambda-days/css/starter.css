@@ -6,3 +6,8 @@ blockquote {
     padding-left: 2em;
     padding-right: 2em;
 }
+
+.caption {
+    color: black;
+    background-color: white;
+}
