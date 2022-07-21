@@ -1,0 +1,67 @@
+/pagewidth 148 def
+/pageheight 210 def
+
+/acc_pow { % a 1 n -- a^n
+    dup 0 eq {
+        pop exch pop
+    } {
+        exch    % a n acc
+        2 index % a n acc a
+        mul     % a n acc'
+        exch    % a acc' n
+        1 sub   % a acc' n'
+        acc_pow
+    } ifelse
+} def
+
+/pow { % a n -- a^n
+    1 exch acc_pow
+} def
+
+/circlepoint { % size angle -- size*cos(angle) size*sin(angle)
+    dup cos exch sin % size cos(angle) sin(angle)
+    2 index mul      % size cos(angle) size*sin(angle)
+    3 1 roll         % size*sin(angle) size cos(angle)
+    mul exch
+} def
+
+/digits { % b n m -- [d_0 .. d_(m-1)]
+    [ 4 1 roll % [ b n m
+    { % [ d_0 d_1 ... b n
+        dup % [d_0 d_1 ... b n n
+        2 index idiv exch % [d_0 d_1 ... b n' n
+        2 index mod 3 1 roll % [d_0 d_1 ... d_i b n' 
+    } repeat
+    pop pop
+    ]
+} def
+
+/koch { % n size
+    [/size /n] dup length 2 add dict begin { exch def } forall
+        /alpha 60 def
+        /size size 3 n pow div def
+        0 0 moveto
+        0 1 4 n pow 1 sub {
+            0 4 3 2 roll n 
+            digits {
+                [{} {alpha add} {alpha sub} {}] exch get exec
+            } forall
+            /angle exch def
+            size angle circlepoint rlineto
+        } for
+    end
+} def
+
+72 25.4 div dup scale
+
+/offset 10 def
+/size pagewidth 2 offset mul sub def
+
+offset pageheight 2 div translate
+1 10 div setlinewidth
+
+newpath
+6 size koch
+stroke
+
+showpage

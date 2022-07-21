@@ -44,3 +44,39 @@ background-size: contain
 
 --
 ## .caption[Muhammad ibn Musa al-Khwarizmi]
+
+---
+## \\(\frac{-b\pm\sqrt{b^{2}+4ac}}{2a}\\)
+
+---
+## \\(ax^2+bx+c=0\\)
+
+---
+* \\(ax^2+bx+c=0\\)
+* \\(ax^2+bx=c\\)
+* \\(ax^2+c=bx\\)
+* \\(ax^2=bx+c0\\)
+
+---
+> We are seeking a quantity such that a square of this size to which is added an area of 1887
+> is equal to a rectangle with dimensions 88 and the unknown quantity.
+
+---
+background-image: url(image/tartaglia.jpg)
+background-position: center
+background-size: contain
+
+---
+background-image: url(image/koch.png)
+background-position: center
+background-size: contain
+
+---
+background-image: url(image/hilbert.jpg)
+background-position: center
+background-size: contain
+
+---
+background-image: url(image/turing.jpg)
+background-position: center
+background-size: contain
