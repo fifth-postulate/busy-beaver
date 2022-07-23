@@ -80,3 +80,24 @@ background-size: contain
 background-image: url(image/turing.jpg)
 background-position: center
 background-size: contain
+
+---
+.turing-machine-description[{
+  "tm": {
+    "tape": {
+      "left": [],
+      "current": "I",
+      "right": ["I", "I", "I"]
+    },
+    "state": 0,
+    "transitions": [
+      { "current": [0, "I"], "next": [0, "I", "R"] },
+      { "current": [0, "_"], "next": [1, "I", "L"] },
+      { "current": [1, "I"], "next": [1, "I", "L"] },
+      { "current": [1, "_"], "next": [2, "_", "R"] }
+    ]
+  },
+  "blank": "_",
+  "visible_tape": 4,
+  "running": false
+}]

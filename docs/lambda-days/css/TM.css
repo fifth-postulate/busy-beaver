@@ -1,0 +1,129 @@
+body {
+    --tape-size: 75px;
+    --tape-border-width: 1px;
+    --tape-background: #fffacd;
+    --cell-size: 76px;
+    --cell-number: 9;
+    --state-size: 50px;
+    --display-corner-radius: 5px;
+}
+
+.container, .dock {
+    background-color:gray;
+    padding: var(--display-corner-radius);
+    border-radius: var(--display-corner-radius);
+    width: calc(var(--cell-number)*var(--cell-size));
+}
+
+.container > div, .turing-machine > div {
+    margin-bottom: 5px;
+}
+
+.container > div:last-child, .turing-machine > div:last-child {
+    margin-bottom: 0px;
+}
+
+.container .control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container .control button {
+    background: white;
+    padding: 5px 8px;
+    border-radius: 5px;
+}
+
+.turing-machine .steps {
+    display: flex;
+    justify-content: right;
+}
+
+.turing-machine .steps > span {
+    background: white;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    border-radius: 2px;
+}
+
+.turing-machine .tape {
+    background: var(--tape-background);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.turing-machine .tape .left, .turing-machine .tape .right {
+    display: flex;
+}
+
+.turing-machine .tape .left {
+    flex-direction: row-reverse;
+}
+
+.turing-machine .tape .right {
+    flex-direction: row;
+}
+
+.turing-machine .tape .cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--tape-size);
+    height: var(--tape-size);
+    border-style: dashed;
+    border-width: 0px var(--tape-border-width);
+    border-color: black;
+    font-family: Consolas, monaco, monospace;
+}
+
+.turing-machine .tape .left .cell  {
+    border-width: 0px 0px 0px var(--tape-border-width);
+}
+
+.turing-machine .tape .left .cell:last-child  {
+    border-style: solid;
+}
+
+.turing-machine .tape .right .cell {
+    border-width: 0px var(--tape-border-width) 0px 0px;
+}
+
+.turing-machine .tape .right .cell:last-child {
+    border-style: solid;
+}
+
+.turing-machine .tape .current .cell {
+    border-style: solid;
+    border-color: black;
+    border-width: var(--tape-border-width);
+}
+
+.turing-machine .state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    width: var(--state-size);
+    height: var(--state-size);
+    background: white;
+    border-radius: calc(var(--state-size)/2);
+}
+
+.dock {
+    position: absolute;
+    background: white;
+}
+
+.dock > .load {
+    position: absolute;
+    right: var(--display-corner-radius);
+    top: var(--display-corner-radius);
+}
+
+.dock > #program {
+    width: 100%;
+    min-height: 400px;
+}
