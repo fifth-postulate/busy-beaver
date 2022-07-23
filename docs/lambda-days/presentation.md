@@ -91,13 +91,57 @@ background-size: contain
     },
     "state": 0,
     "transitions": [
-      { "current": [0, "I"], "next": [0, "I", "R"] },
       { "current": [0, "_"], "next": [1, "I", "L"] },
-      { "current": [1, "I"], "next": [1, "I", "L"] },
-      { "current": [1, "_"], "next": [2, "_", "R"] }
+      { "current": [0, "I"], "next": [0, "I", "R"] },
+      { "current": [1, "_"], "next": [2, "_", "R"] },
+      { "current": [1, "I"], "next": [1, "I", "L"] }
     ]
   },
   "blank": "_",
   "visible_tape": 4,
   "running": false
 }]
+
+---
+
+| | 0 | 1 | 2 |
+|-|---|---|---|
+|_|IL1|_R2| H |
+|I|IR0|IL1| H |
+
+---
+
+| | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+|-|---|---|---|---|---|---|---|
+|_|_R1|_L2|_R7|_L5|IL5|_R6| H |
+|I|IR0|IR1|_L3|_L4|IL4|IL5| H |
+
+---
+.turing-machine-description[{
+  "tm": {
+    "tape": {
+      "left": [],
+      "current": "I",
+      "right": ["I", "", "I", "I"]
+    },
+    "state": 0,
+    "transitions": [
+      { "current": [0, "_"], "next": [1, "_", "R"] },
+      { "current": [0, "I"], "next": [0, "I", "R"] },
+      { "current": [1, "_"], "next": [2, "_", "L"] },
+      { "current": [1, "I"], "next": [1, "I", "R"] },
+      { "current": [2, "_"], "next": [7, "_", "R"] },
+      { "current": [2, "I"], "next": [3, "_", "L"] },
+      { "current": [3, "_"], "next": [5, "_", "L"] },
+      { "current": [3, "I"], "next": [4, "_", "L"] },
+      { "current": [4, "_"], "next": [5, "I", "L"] },
+      { "current": [4, "I"], "next": [4, "I", "L"] },
+      { "current": [5, "_"], "next": [6, "_", "R"] },
+      { "current": [5, "I"], "next": [5, "I", "L"] }
+    ]
+  },
+  "blank": "_",
+  "visible_tape": 4,
+  "running": false
+}]
+
