@@ -11,3 +11,24 @@ blockquote {
     color: black;
     background-color: #F2F3F4;
 }
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+table thead th {
+    border-bottom-style: solid;
+    border-bottom-color: black;
+    border-bottom-width: 1px;
+}
+
+table thead th, table tr td {
+    border-right-style: solid;
+    border-right-color: black;
+    border-right-width: 1px;
+}
+
+table thead th:last-child, table tr td:last-child {
+    border-right-style: none;
+}

@@ -55,7 +55,7 @@ background-size: contain
 * \\(ax^2+bx+c=0\\)
 * \\(ax^2+bx=c\\)
 * \\(ax^2+c=bx\\)
-* \\(ax^2=bx+c0\\)
+* \\(ax^2=bx+c\\)
 
 ---
 > We are seeking a quantity such that a square of this size to which is added an area of 1887
@@ -145,3 +145,42 @@ background-size: contain
   "running": false
 }]
 
+---
+## &#129300;
+
+---
+## _Universal_ Turing Machine
+
+--
+
+> a Turing machine that can simulate an arbitrary Turing machine on arbitrary input
+
+---
+## Halting Problem
+
+---
+## Undecidable
+
+--
+
+> There is **no** Turing machine that accurately decides if a TM will halt on input I
+
+---
+## \\(\mathcal{H}\\)
+
+---
+## \\(\mathcal{H}'\\)
+
+> if \\(\mathcal{H}\\) decides that \\(T\overline{T}\\) halts, \\(\mathcal{H}'\overline{T}\\) does **not** halt.<br>
+> when \\(\mathcal{H}\\) decides that \\(T\overline{T}\\) does **not** halt,  \\(\mathcal{H}'\overline{T}\\) halts.<br>
+
+---
+## \\(\mathcal{H}'\overline{\mathcal{H}'}\\)?
+
+--
+
+> \\(\mathcal{H}'\overline{\mathcal{H}'}\\) halts when \\(\mathcal{H}\\) decides that \\(\mathcal{H}'\overline{\mathcal{H}'}\\) does **not** halt.<br>
+> \\(\mathcal{H}'\overline{\mathcal{H}'}\\) does **not** halt when \\(\mathcal{H}\\) decides that \\(\mathcal{H}'\overline{\mathcal{H}'}\\) halts.<br>
+
+---
+## &#128136;
