@@ -223,5 +223,72 @@ background-size: contain
 | \\(n\\)      | 1            | 2            | 3            | 4             | 5              |
 |--------------|--------------|--------------|--------------|---------------|----------------|
 | #TM          | 25           | 6561         | 4826809      | 6975757441    | 16679880978201 |
-| \\(10^{n}\\) | \\(10^{2}\\) | \\(10^{4}\\) | \\(10^{7}\\) | \\(10^{10}\\) | \\(10^{14}\\)  |
+| \\(10^{m}\\) | \\(10^{2}\\) | \\(10^{4}\\) | \\(10^{7}\\) | \\(10^{10}\\) | \\(10^{14}\\)  |
 
+---
+background-image: url(image/how-it-started.jpg)
+background-position: center
+background-size: contain
+
+## Plan
+
+---
+background-image: url(image/how-it-is-going.jpg)
+background-position: center
+background-size: contain
+
+## &#129327;
+
+---
+
+| | 0 | 1 | 2 | 3 | 4 |
+|-|---|---|---|---|---|
+|_| H | ? | ? | ? | ? |
+|I| ? | ? | ? | ? | ? |
+
+---
+
+| | 0 | 1 | 2 | 3 | 4 |
+|-|---|---|---|---|---|
+|_|IR4| ? | ? | ? | ? |
+|I| ? | ? | ? | ? | ? |
+
+---
+
+| | 0      | 1 | 2 | 3 | 4 |
+|-|--------|---|---|---|---|
+|_|IR1| ? | ? | ? | ? |
+|I| ?      | ? | ? | ? | ? |
+
+---
+.turing-machine-description[{
+  "tm": {
+    "tape": {
+      "left": [],
+      "current": "I",
+      "right": ["I", "I", "I", "I", "I", "I", "I", "I"]
+    },
+    "state": 0,
+    "transitions": [
+      { "current": [0, "_"], "next": [1, "I", "R"] },
+      { "current": [0, "I"], "next": [0, "I", "R"] }
+    ]
+  },
+  "blank": "_",
+  "visible_tape": 4,
+  "running": false
+}]
+
+---
+## Discrimination
+
+---
+## Let's get ph~~ys~~*ilosoph*ical
+
+---
+## Goldbach Conjecture
+
+> Each even natural number bigger then 2 is the sum of two primes
+
+---
+## Take away
