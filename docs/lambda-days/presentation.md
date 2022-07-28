@@ -184,3 +184,44 @@ background-size: contain
 
 ---
 ## &#128136;
+
+---
+## Meta-Theorem
+
+> Any interesting aspect is undecidable!
+
+---
+## Busy Beaver
+
+--
+
+> What is the maximum number of steps a Turing Machine with \\(n\\) states can take before it halts.
+
+--
+
+> What is the maximum number of 1s a Turing Machine with \\(n\\) states can write on the empty tape before it halts.
+
+---
+
+| \\(n\\)      | 1 | 2 | 3  | 4   | 5         |
+|--------------|---|---|----|-----|-----------|
+| \\(S\\)      | 1 | 6 | 21 | 107 | 47176870? |
+| \\(\Sigma\\) | 1 | 4 | 6  | 13  | 4098?     |
+
+---
+## How hard can it be?
+
+---
+## \\(10^{80}\\)
+
+---
+
+## \\((2\cdot 2\cdot k + 1)^{2\cdot k}\\)
+
+--
+
+| \\(n\\)      | 1            | 2            | 3            | 4             | 5              |
+|--------------|--------------|--------------|--------------|---------------|----------------|
+| #TM          | 25           | 6561         | 4826809      | 6975757441    | 16679880978201 |
+| \\(10^{n}\\) | \\(10^{2}\\) | \\(10^{4}\\) | \\(10^{7}\\) | \\(10^{10}\\) | \\(10^{14}\\)  |
+
