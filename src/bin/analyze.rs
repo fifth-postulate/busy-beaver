@@ -1,6 +1,6 @@
 use busy_beaver::{
     report::Report,
-    turing::{Machine, Programs},
+    turing::{Machine, Programs, SimpleTape},
 };
 use std::env;
 use std::time::Instant;
@@ -20,7 +20,7 @@ fn main() {
     let start = Instant::now();
     for program in Programs::all(n) {
         print!(".");
-        let mut machine = Machine::new(&program);
+        let mut machine = Machine::new(SimpleTape::empty(), &program);
         let assessment = machine.run(maximum);
         report.update_with(&assessment);
     }

@@ -5,36 +5,37 @@ use super::{
     tape::Tape,
 };
 
-pub struct Machine<'a> {
-    tape: Tape,
+pub struct Machine<'a, T>
+where
+    T: Tape + Sized,
+{
+    tape: T,
     program: &'a dyn Program,
     state: State,
 }
 
-impl<'a> From<Machine<'a>> for (Tape, State, &'a dyn Program) {
-    fn from(machine: Machine<'a>) -> Self {
+impl<'a, T> From<Machine<'a, T>> for (T, State, &'a dyn Program)
+where
+    T: Tape + Sized,
+{
+    fn from(machine: Machine<'a, T>) -> Self {
         (machine.tape, machine.state, machine.program)
     }
 }
 
-impl<'a> Machine<'a> {
-    pub fn new(program: &'a dyn Program) -> Self {
+impl<'a, T> Machine<'a, T>
+where
+    T: Tape + Sized,
+{
+    pub fn new(tape: T, program: &'a dyn Program) -> Self {
         Self {
-            tape: Tape::empty(),
+            tape,
             state: State::Number(0),
             program,
         }
     }
 
-    pub fn with_state(state: State, program: &'a dyn Program) -> Self {
-        Self {
-            tape: Tape::empty(),
-            program,
-            state,
-        }
-    }
-
-    pub fn with(tape: Tape, state: State, program: &'a dyn Program) -> Self {
+    pub fn with(tape: T, state: State, program: &'a dyn Program) -> Self {
         Self {
             tape,
             state,
@@ -133,7 +134,7 @@ pub struct Details {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::turing::{direction::Direction, program::CompleteProgram};
+    use crate::turing::{direction::Direction, program::CompleteProgram, tape::SimpleTape};
 
     #[test]
     fn a_simple_machine_can_be_run() {
@@ -155,7 +156,7 @@ mod tests {
             (Symbol::NonBlank, Direction::Right, State::Halted),
         );
         let start = State::Number(0);
-        let mut machine = Machine::with_state(start, &program);
+        let mut machine = Machine::with(SimpleTape::empty(), start, &program);
 
         let steps = machine.run(10);
 

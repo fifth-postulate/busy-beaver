@@ -1,6 +1,6 @@
 use busy_beaver::{
     report::Report,
-    turing::{Details, IncompleteProgram, Machine, Program, Progress, State, Tape},
+    turing::{Details, IncompleteProgram, Machine, Program, Progress, SimpleTape, State, Tape},
 };
 
 use std::env;
@@ -18,9 +18,9 @@ fn main() {
         .unwrap_or(10_000);
 
     let mut report = Report::new();
-    let mut candidates: Vec<(u128, Tape, State, IncompleteProgram)> = vec![(
+    let mut candidates: Vec<(u128, SimpleTape, State, IncompleteProgram)> = vec![(
         0,
-        Tape::empty(),
+        SimpleTape::empty(),
         State::Number(0),
         IncompleteProgram::with_states(n),
     )];
@@ -28,7 +28,7 @@ fn main() {
     while let Some((steps_taken, tape, state, program)) = candidates.pop() {
         print!(".");
         let mut step_count = steps_taken;
-        let mut machine: Machine = Machine::with(tape, state, &program);
+        let mut machine = Machine::with(tape, state, &program);
         loop {
             let progress = machine.step();
 
@@ -54,7 +54,7 @@ fn main() {
                     break;
                 }
                 Progress::Limbo => {
-                    let (t, s, _): (Tape, State, &dyn Program) = machine.into();
+                    let (t, s, _): (SimpleTape, State, &dyn Program) = machine.into();
                     for p in program.extentions((s, *t.read())) {
                         candidates.push((step_count, t.clone(), s, p));
                     }
