@@ -55,7 +55,7 @@ fn main() {
                 }
                 Progress::Limbo => {
                     let (t, s, _): (SimpleTape, State, &dyn Program) = machine.into();
-                    for p in program.extentions((s, *t.read())) {
+                    for p in program.extentions((s, t.read())) {
                         candidates.push((step_count, t.clone(), s, p));
                     }
                     break;

@@ -47,7 +47,7 @@ where
         if !self.state.halted() {
             let key = Key {
                 state: self.state,
-                symbol: *self.tape.read(),
+                symbol: self.tape.read(),
             };
             match self.program.lookup(&key) {
                 Lookup::Unknown => Progress::Stuck,

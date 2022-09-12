@@ -1,6 +1,7 @@
 use super::Tape;
 use crate::turing::{direction::Direction, symbol::Symbol};
 
+#[derive(Debug)]
 pub struct SimpleTape {
     head: Head,
     right: Vec<Symbol>,
@@ -37,11 +38,11 @@ impl Tape for SimpleTape {
         }
     }
 
-    fn read(&self) -> &Symbol {
+    fn read(&self) -> Symbol {
         if self.head >= 0i128 {
-            self.right.get(self.right_index()).unwrap_or_default()
+            *self.right.get(self.right_index()).unwrap_or_default()
         } else {
-            self.left.get(self.left_index()).unwrap_or_default()
+            *self.left.get(self.left_index()).unwrap_or_default()
         }
     }
 
@@ -87,7 +88,7 @@ mod tests {
     fn empty_tape_contains_blanks() {
         let tape = SimpleTape::empty();
 
-        assert_eq!(*tape.read(), Symbol::Blank);
+        assert_eq!(tape.read(), Symbol::Blank);
     }
 
     #[test]
@@ -96,7 +97,7 @@ mod tests {
 
         tape.write(Symbol::NonBlank);
 
-        assert_eq!(*tape.read(), Symbol::NonBlank);
+        assert_eq!(tape.read(), Symbol::NonBlank);
     }
 
     #[test]

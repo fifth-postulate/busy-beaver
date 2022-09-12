@@ -13,4 +13,4 @@ pub use program::{
 };
 pub use state::{State, States};
 pub use symbol::{Symbol, Symbols};
-pub use tape::{SimpleTape, Tape};
+pub use tape::{SimpleTape, CompoundTape, Tape};
