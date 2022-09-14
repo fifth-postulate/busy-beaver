@@ -1,3 +1,4 @@
+//! Implementation of a `Tape` using [run-length encoding](https://en.wikipedia.org/wiki/Run-length_encoding) of symbols.
 use super::Tape;
 use crate::turing::{direction::Direction, symbol::Symbol};
 use std::cmp::Ordering;
@@ -50,6 +51,7 @@ impl Ord for Occurrence {
     }
 }
 
+/// A `Tape` implementation that use a run-length encoding of symbols
 #[derive(Debug)]
 pub struct CompoundTape {
     right: Vec<(Symbol, Occurrence)>,
@@ -57,6 +59,7 @@ pub struct CompoundTape {
 }
 
 impl CompoundTape {
+    /// Create an empty tape
     pub fn empty() -> Self {
         Self {
             right: vec![(Symbol::Blank, Occurrence::Infinite)],

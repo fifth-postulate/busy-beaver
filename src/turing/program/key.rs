@@ -1,10 +1,14 @@
+/// The configuration a Turing machine is in provides a key to lookup in a progam
 use crate::turing::state::{State, States};
 use crate::turing::symbol::{Symbol, Symbols};
 use cartesian::*;
 
+/// The current configuration of Turing machine
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub struct Key {
+    /// The state the Turing machine is in
     pub state: State,
+    /// The symbol that the tape head is reading
     pub symbol: Symbol,
 }
 
@@ -26,6 +30,8 @@ impl From<usize> for Key {
 }
 
 impl Key {
+    /// Keys have an index.
+    /// TODO describe why and how it is calculated
     pub fn idx(&self) -> usize {
         match (self.state, self.symbol) {
             (State::Number(s), Symbol::Blank) => (2 * s) as usize,
@@ -35,11 +41,14 @@ impl Key {
     }
 }
 
+
+/// Iterator for keys
 pub struct Keys {
     iterator: Box<dyn Iterator<Item = Key>>,
 }
 
 impl Keys {
+    /// Iterate through a number of keys up to a maximum
     pub fn up_to(maximum: u8) -> Self {
         let iterator = cartesian!(States::non_halted_up_to(maximum), Symbols::all()).map(|tuple| {
             let key: Key = tuple.into();

@@ -1,5 +1,7 @@
+//! Gather statistics about a collection of Turing machines.
 use crate::turing::{Assessment, Details};
 
+/// Summary of information about the Turing machines under consideration.
 #[derive(Debug, PartialEq, Eq)]
 pub struct Report {
     subjects: usize,
@@ -12,6 +14,7 @@ pub struct Report {
 }
 
 impl Report {
+    /// Create an empty report
     pub fn new() -> Self {
         Self {
             subjects: 0,
@@ -24,6 +27,7 @@ impl Report {
         }
     }
 
+    /// Update the report with the assessment of the progress of a Turing machine.
     pub fn update_with(&mut self, assessment: &Assessment) {
         match assessment {
             Assessment::HaltedIn(details) => {
@@ -38,6 +42,7 @@ impl Report {
         };
     }
 
+    /// Update the report with the details of a **halted** Turing machine.
     pub fn halted(&mut self, details: Details) {
         self.subjects += 1;
         self.total += details.multiplicity;
@@ -45,12 +50,14 @@ impl Report {
         self.update_champion(details);
     }
 
+    /// Update the report with the details of a Turing machine whose behaviour is **indeterminate**.
     pub fn indeterminated(&mut self, details: Details) {
         self.subjects += 1;
         self.total += details.multiplicity;
         self.indeterminate += details.multiplicity;
     }
 
+    /// Update the report with the details of a Turing machine that did not progess.
     pub fn stuck(&mut self, details: Details) {
         self.subjects += 1;
         self.total += details.multiplicity;
@@ -93,6 +100,7 @@ impl Default for Report {
     }
 }
 
+/// A *champion* is a Turing machine that out performs other Turing machines in a certain category.
 #[derive(Debug, PartialEq, Eq)]
 pub struct Champion {
     details: Details,
@@ -100,6 +108,7 @@ pub struct Champion {
 }
 
 impl Champion {
+    /// Creates a new champion from its corresponding details
     pub fn new(details: Details) -> Self {
         Self { details, count: 1 }
     }

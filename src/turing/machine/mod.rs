@@ -1,3 +1,4 @@
+//! All parts assembly into a single machine
 use super::{
     program::{Action, Key, Lookup, Program},
     state::State,
@@ -5,6 +6,7 @@ use super::{
     tape::Tape,
 };
 
+/// A Turing machine
 pub struct Machine<'a, T>
 where
     T: Tape + Sized,
@@ -27,6 +29,7 @@ impl<'a, T> Machine<'a, T>
 where
     T: Tape + Sized,
 {
+    /// Create a Turing machine with a certain tape and program. Starts in state 0
     pub fn new(tape: T, program: &'a dyn Program) -> Self {
         Self {
             tape,
@@ -35,6 +38,7 @@ where
         }
     }
 
+    /// Create a Turing machine with a certain tape, state and program.
     pub fn with(tape: T, state: State, program: &'a dyn Program) -> Self {
         Self {
             tape,
@@ -43,6 +47,7 @@ where
         }
     }
 
+    /// Take a single step
     pub fn step(&mut self) -> Progress {
         if !self.state.halted() {
             let key = Key {
@@ -72,6 +77,7 @@ where
         }
     }
 
+    /// Take several steps until either the maximum number of steps is attained or the machine halted.
     pub fn run(&mut self, maximum_steps: u128) -> Assessment {
         let mut steps_taken: u128 = 0u128;
         while !self.state.halted() && steps_taken < maximum_steps {
@@ -104,30 +110,44 @@ where
         }
     }
 
+    /// The number of non blank symbols on the tape
     pub fn score(&self) -> usize {
         self.tape.count(&Symbol::NonBlank)
     }
 }
 
+/// The possibilities when a Turing machine takes a step
 #[derive(Debug, PartialEq, Eq)]
 pub enum Progress {
+    /// The Turing machine could have halted.
     Halted,
+    /// The Turing machine could have gotten stuck. TODO describe when this happens
     Stuck,
+    /// The Turing machine could not progress, because of an incomplete program
     Limbo,
+    /// The Turing machine could have made progress
     Made,
 }
 
+/// The possibilities when a Turing machine is run.
 #[derive(Debug, PartialEq, Eq)]
 pub enum Assessment {
+    /// The Turing machine could not make progress after a certain number of steps
     NoProgress(Progress, Details),
+    /// The Turing machine could have halted
     HaltedIn(Details),
+    /// The Turing machine is still running after a maximum number of steps is reached
     NotHalted(Details),
 }
 
+/// Details of a run
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct Details {
+    /// Number of steps taken
     pub steps: u128,
+    /// Number of non blank symbols on the tape
     pub score: usize,
+    /// The multiplicity of the program that was used to run the Turing machine
     pub multiplicity: usize,
 }
 

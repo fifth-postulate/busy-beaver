@@ -1,3 +1,4 @@
+//! Which actions a Turing machine can do
 use crate::turing::direction;
 use crate::turing::direction::{Direction, Directions};
 use crate::turing::state;
@@ -11,12 +12,18 @@ use std::fmt::{Display, Formatter};
 use std::iter::once;
 use std::str::FromStr;
 
+/// Which actions a Turing machine can do
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum Action {
+    /// A Turing machine can halt
     Halt,
+    /// Or a Turing machine can do something
     Do {
+        /// Symbol to write to the tape
         symbol: Symbol,
+        /// The direction to move the tape head in
         direction: Direction,
+        /// Which state to transition in
         state: State,
     },
 }
@@ -84,11 +91,13 @@ pub enum ParseError {
     UnknownSymbol(String),
 }
 
+/// Iterator for actions
 pub struct Actions {
     iterator: Box<dyn Iterator<Item = Action>>,
 }
 
 impl Actions {
+    /// Create a iterator that iterates through a number of states up to a maximum.
     pub fn up_to(maximum: u8) -> Self {
         let iterator =
             once(Action::Halt).chain(States::non_halted_up_to(maximum).flat_map(|state| {

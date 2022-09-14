@@ -1,8 +1,10 @@
+//! Incomplete programs
 use super::{Key, Keys, Lookup, Program};
 use crate::turing::{Action, Actions, State};
 use std::cmp::{max, min};
 use std::fmt::{self, Display, Formatter};
 
+/// An incomplete program
 #[derive(Debug, PartialEq, Eq)]
 pub struct IncompleteProgram {
     n: u8,
@@ -29,6 +31,7 @@ impl Program for IncompleteProgram {
 }
 
 impl IncompleteProgram {
+    /// Create an incomplete program with a maximum number of states.
     pub fn with_states(n: u8) -> Self {
         Self {
             n,
@@ -36,6 +39,7 @@ impl IncompleteProgram {
         }
     }
 
+    /// Insert an action for a certain key
     pub fn insert<K, A>(&mut self, key: K, action: A)
     where
         K: Into<Key>,
@@ -45,6 +49,7 @@ impl IncompleteProgram {
         self.program[key.idx()] = Some(action.into());
     }
 
+    /// return an iterator that extends this program in all sensible ways.
     pub fn extentions<K>(&self, key: K) -> Extentions
     where
         K: Into<Key>,

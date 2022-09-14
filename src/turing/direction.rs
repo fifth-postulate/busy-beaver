@@ -1,10 +1,15 @@
+//! Directions the tape head can move in
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
+
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
+/// The different directions the tape head can move in.
 pub enum Direction {
+    /// The tape head can move left
     Left,
+    /// The tape head can move right 
     Right,
 }
 
@@ -34,11 +39,13 @@ pub enum ParseError {
     UnknownSymbol(String),
 }
 
+/// An iterator for `Direction`s.
 pub struct Directions {
     current: Option<Direction>,
 }
 
 impl Directions {
+    /// Creates an iterator that iterates over all directions.
     pub fn all() -> Self {
         Self {
             current: Some(Direction::Left),

@@ -1,14 +1,19 @@
+//! A Turing machine can be in a number of states
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
+/// The states a Turing machine can be in
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 pub enum State {
+    /// The halted state signals that the Turing machine finished operating.
     Halted,
+    /// a non-halted state, indexed by an natural number.
     Number(u8),
 }
 
 impl State {
+    /// Determine if a state is the halted state.
     pub fn halted(&self) -> bool {
         matches!(self, State::Halted)
     }
@@ -51,12 +56,14 @@ pub enum ParseError {
     UnknownState(String),
 }
 
+/// Iterator for `State`s.
 pub struct States {
     maximum: u8,
     current: Option<State>,
 }
 
 impl States {
+    /// Create an iterator for states up to a maximum state index, including the halt state.
     pub fn up_to(maximum: u8) -> Self {
         Self {
             maximum,
@@ -64,6 +71,7 @@ impl States {
         }
     }
 
+    /// Create an iterator for states up to a maximum state index, excluding the halt state.
     pub fn non_halted_up_to(maximum: u8) -> Self {
         Self {
             maximum,

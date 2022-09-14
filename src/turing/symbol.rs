@@ -1,10 +1,16 @@
+//! The alphabet the Turing machin can write on the tape.
+//! 
+//! We are only interested in an alphabet of size two.
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
+/// The various symbols that can be written on the tape.
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 pub enum Symbol {
+    /// the blank symbol, represented as "0" 
     Blank,
+    /// the non blank symbol, represented as "1"
     NonBlank,
 }
 
@@ -55,11 +61,13 @@ pub enum ParseError {
     UnknownSymbol(String),
 }
 
+/// Iterator for `Symbol`
 pub struct Symbols {
     current: Option<Symbol>,
 }
 
 impl Symbols {
+    /// Create an iterator for all symbols.
     pub fn all() -> Self {
         Self {
             current: Some(Symbol::Blank),

@@ -1,6 +1,10 @@
+/// Naive implementation of a `Tape`.
+/// 
+/// Keeps two vectors of symbols, representing all cells to the left and all cells to the right, and an offset into these vectors.
 use super::Tape;
 use crate::turing::{direction::Direction, symbol::Symbol};
 
+/// A naive implementation of a `Tape`
 #[derive(Debug)]
 pub struct SimpleTape {
     head: Head,
@@ -11,6 +15,7 @@ pub struct SimpleTape {
 pub type Head = i128;
 
 impl SimpleTape {
+    /// Create an empty tape, i.e. a tape with only blank symbols on it
     pub fn empty() -> Self {
         Self {
             head: 0,

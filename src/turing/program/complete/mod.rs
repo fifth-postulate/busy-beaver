@@ -1,3 +1,4 @@
+//! A complete program
 use super::action;
 use super::action::{Action, Actions};
 use super::{Key, Keys};
@@ -9,6 +10,7 @@ use std::fmt::{Display, Formatter};
 use std::iter::IntoIterator;
 use std::str::FromStr;
 
+/// A complete program
 #[derive(Debug, PartialEq, Eq)]
 pub struct CompleteProgram {
     program: Vec<Action>,
@@ -24,12 +26,14 @@ impl Program for CompleteProgram {
 }
 
 impl CompleteProgram {
+    /// Create an empty complete progam
     pub fn new() -> Self {
         Self {
             program: Vec::new(),
         }
     }
 
+    /// Insert an action for a certain key into the program
     pub fn insert<K, A>(&mut self, key: K, action: A)
     where
         K: Into<Key>,
@@ -140,6 +144,7 @@ impl<'a> Iterator for KeyActionIterator<'a> {
     }
 }
 
+/// Iterator for complete progams
 pub struct CompletePrograms {
     iterator: Box<dyn Iterator<Item = CompleteProgram>>,
 }
@@ -245,6 +250,7 @@ all_programs!(4, all4);
 all_programs!(5, all5);
 
 impl CompletePrograms {
+    /// Create an iterator that iteratos through all complete programs of a certain number of states
     pub fn all(n: u8) -> Self {
         match n {
             1 => all1(),
