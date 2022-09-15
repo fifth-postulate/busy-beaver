@@ -1,4 +1,25 @@
 //! Gather statistics about a collection of Turing machines.
+//! 
+//! When analyzing a collection of Turing machines in the context of the busy beaver problem we are interested in the following statistics
+//! * How many subjects are analyzed.
+//! * How many programs are represented by the subjects.
+//! * How many subjects halted.
+//! * How many subjects didn't halt within the alloted running time.
+//! * How many subjects got stuck.
+//! * What is a current sigma champion
+//! * What is a current s champion
+//!
+//! The following code is representative for how to gather statistics
+//! 
+//! ```
+//! # use busy_beaver::{turing::{SimpleTape, Programs, Machine}, report::Report};
+//! let mut report = Report::new();
+//! for program in Programs::all(2) {
+//!     let mut machine = Machine::new(SimpleTape::empty(), &program);
+//!     let assessment = machine.run(100);
+//!     report.update_with(&assessment);
+//! }
+//! ```
 use crate::turing::{Assessment, Details};
 
 /// Summary of information about the Turing machines under consideration.

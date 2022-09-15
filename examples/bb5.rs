@@ -6,8 +6,8 @@ fn main() {
     let mut machine = Machine::new(Tape::empty(), &program);
 
     let start = Instant::now();
-    let steps = machine.run(50_000_000);
+    let assessment = machine.run(50_000_000);
     let duration = start.elapsed();
 
-    println!("{:?} steps taken in {:?}", steps, duration);
+    println!("{:?} in {:?}", assessment, duration);
 }
