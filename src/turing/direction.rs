@@ -3,13 +3,12 @@ use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 /// The different directions the tape head can move in.
 pub enum Direction {
     /// The tape head can move left
     Left,
-    /// The tape head can move right 
+    /// The tape head can move right
     Right,
 }
 

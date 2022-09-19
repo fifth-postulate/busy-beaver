@@ -2,6 +2,7 @@
 use super::Tape;
 use crate::turing::{direction::Direction, symbol::Symbol};
 use std::cmp::Ordering;
+use std::convert::From;
 
 #[derive(Debug, PartialEq, Eq)]
 enum Occurrence {
@@ -52,7 +53,7 @@ impl Ord for Occurrence {
 }
 
 /// A `Tape` implementation that use a run-length encoding of symbols
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct CompoundTape {
     right: Vec<(Symbol, Occurrence)>,
     left: Vec<(Symbol, Occurrence)>,
@@ -111,22 +112,24 @@ impl Tape for CompoundTape {
     }
 
     fn write(&mut self, symbol: Symbol) {
-        if let Some((s, o)) = self.right.last() {
-            if *s != symbol {
-                if *o > Occurrence::Finite(1) {
-                    let p = self.right.last_mut().unwrap(/* safe because of the outer guard */);
-                    p.1.decrement();
+        if let Some((s, o)) = self.right.pop(/* safe because sentinel value */) {
+            if s != symbol {
+                if o > Occurrence::Finite(1) {
+                    self.right.push((s, o.decrement()));
                     self.right.push((symbol, Occurrence::Finite(1)));
                 } else {
-                    // o == Occurrence::Finite(1)
-                    self.right.pop();
-                    let p = self.right.last_mut().unwrap(/* safe because sentinel value */);
-                    if p.0 == symbol {
-                        p.1.increment();
-                    } else {
-                        self.right.push((symbol, Occurrence::Finite(1)));
+                    // o == Occurrence::Finite(1), so can not be sentinel value
+                    if let Some((t, p)) = self.right.pop(/* safe because of sentinel value */) {
+                        if t == symbol {
+                            self.right.push((t, p.increment()));
+                        } else {
+                            self.right.push((t, p));
+                            self.right.push((symbol, Occurrence::Finite(1)));
+                        }
                     }
                 }
+            } else {
+                self.right.push((s, o));
             }
         }
     }
@@ -146,9 +149,25 @@ impl Tape for CompoundTape {
     }
 }
 
+impl From<(Vec<(Symbol, Occurrence)>, Vec<(Symbol, Occurrence)>)> for CompoundTape {
+    fn from(value: (Vec<(Symbol, Occurrence)>, Vec<(Symbol, Occurrence)>)) -> Self {
+        let (mut left, mut right) = value;
+        left.push((Symbol::Blank, Occurrence::Infinite));
+        left.reverse();
+        right.push((Symbol::Blank, Occurrence::Infinite));
+        right.reverse();
+
+        Self { left, right }
+    }
+}
+enum ConvertError {
+    Generic,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::convert::{From, Into};
 
     #[test]
     fn empty_tape_contains_blanks() {
@@ -187,5 +206,121 @@ mod tests {
         }
 
         assert_eq!(tape.count(&Symbol::NonBlank), 10usize);
+    }
+
+    #[cfg(test)]
+    mod implementation {
+        use super::*;
+        use crate::turing::Direction;
+        use std::convert::Into;
+
+        enum Instruction {
+            Move(Direction),
+            Write(Symbol),
+        }
+
+        #[test]
+        fn test_sequence_of_instructions() {
+            test_sequence(vec![], (vec![], vec![]).into());
+            test_sequence(
+                vec![Instruction::Move(Direction::Left)],
+                (vec![], vec![]).into(),
+            );
+            test_sequence(
+                vec![Instruction::Move(Direction::Right)],
+                (vec![], vec![]).into(),
+            );
+            test_sequence(
+                vec![Instruction::Write(Symbol::Blank)],
+                (vec![], vec![]).into(),
+            );
+            test_sequence(
+                vec![Instruction::Write(Symbol::NonBlank)],
+                (vec![], vec![(Symbol::NonBlank, Occurrence::Finite(1))]).into(),
+            );
+            test_sequence(
+                vec![
+                    Instruction::Write(Symbol::NonBlank),
+                    Instruction::Move(Direction::Right),
+                ],
+                (vec![(Symbol::NonBlank, Occurrence::Finite(1))], vec![]).into(),
+            );
+            test_sequence(
+                vec![
+                    Instruction::Write(Symbol::NonBlank),
+                    Instruction::Move(Direction::Left),
+                ],
+                (
+                    vec![],
+                    vec![
+                        (Symbol::Blank, Occurrence::Finite(1)),
+                        (Symbol::NonBlank, Occurrence::Finite(1)),
+                    ],
+                )
+                    .into(),
+            );
+            test_sequence(
+                vec![
+                    Instruction::Write(Symbol::NonBlank),
+                    Instruction::Move(Direction::Right),
+                    Instruction::Write(Symbol::Blank),
+                ],
+                (vec![(Symbol::NonBlank, Occurrence::Finite(1))], vec![]).into(),
+            );
+            test_sequence(
+                vec![
+                    Instruction::Write(Symbol::NonBlank),
+                    Instruction::Move(Direction::Right),
+                    Instruction::Write(Symbol::NonBlank),
+                ],
+                (
+                    vec![(Symbol::NonBlank, Occurrence::Finite(1))],
+                    vec![(Symbol::NonBlank, Occurrence::Finite(1))],
+                )
+                    .into(),
+            );
+            test_sequence(
+                vec![
+                    Instruction::Write(Symbol::NonBlank),
+                    Instruction::Move(Direction::Left),
+                    Instruction::Write(Symbol::Blank),
+                ],
+                (
+                    vec![],
+                    vec![
+                        (Symbol::Blank, Occurrence::Finite(1)),
+                        (Symbol::NonBlank, Occurrence::Finite(1)),
+                    ],
+                )
+                    .into(),
+            );
+            test_sequence(
+                vec![
+                    Instruction::Write(Symbol::NonBlank),
+                    Instruction::Move(Direction::Left),
+                    Instruction::Write(Symbol::NonBlank),
+                ],
+                (vec![], vec![(Symbol::NonBlank, Occurrence::Finite(2))]).into(),
+            );
+        }
+
+        fn test_sequence(instructions: Vec<Instruction>, expected: CompoundTape) {
+            let mut actual = CompoundTape::empty();
+
+            for instruction in instructions {
+                execute(&mut actual, &instruction)
+            }
+
+            assert_eq!(actual, expected);
+        }
+
+        fn execute(tape: &mut CompoundTape, instruction: &Instruction) {
+            match *instruction {
+                Instruction::Move(direction) => tape.move_to(&direction),
+                Instruction::Write(symbol) => tape.write(symbol),
+            }
+        }
+
+        fn ignore_test_sequence(_: Vec<Instruction>, _: CompoundTape) {}
     }
 }

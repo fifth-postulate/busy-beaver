@@ -1,5 +1,5 @@
 /// Naive implementation of a `Tape`.
-/// 
+///
 /// Keeps two vectors of symbols, representing all cells to the left and all cells to the right, and an offset into these vectors.
 use super::Tape;
 use crate::turing::{direction::Direction, symbol::Symbol};

@@ -1,5 +1,5 @@
 //! Gather statistics about a collection of Turing machines.
-//! 
+//!
 //! When analyzing a collection of Turing machines in the context of the busy beaver problem we are interested in the following statistics
 //! * How many subjects are analyzed.
 //! * How many programs are represented by the subjects.
@@ -10,7 +10,7 @@
 //! * What is a current s champion
 //!
 //! The following code is representative for how to gather statistics
-//! 
+//!
 //! ```
 //! # use busy_beaver::{turing::{SimpleTape, Programs, Machine}, report::Report};
 //! let mut report = Report::new();

@@ -1,12 +1,12 @@
 //! The tape of a Turing machine
-//! 
+//!
 //! A tape can be writen to, can be read and can be moved in either direction.
-mod simple;
 mod compound;
+mod simple;
 
 use crate::turing::{direction::Direction, symbol::Symbol};
-pub use simple::SimpleTape;
 pub use compound::CompoundTape;
+pub use simple::SimpleTape;
 
 /// Characteristics of a tape.
 pub trait Tape {

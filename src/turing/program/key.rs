@@ -41,7 +41,6 @@ impl Key {
     }
 }
 
-
 /// Iterator for keys
 pub struct Keys {
     iterator: Box<dyn Iterator<Item = Key>>,
