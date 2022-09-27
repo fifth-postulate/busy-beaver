@@ -3,7 +3,7 @@ use crate::turing::state::{State, States};
 use crate::turing::symbol::{Symbol, Symbols};
 use cartesian::*;
 
-/// The current configuration of Turing machine
+/// The current configuration of a Turing machine
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub struct Key {
     /// The state the Turing machine is in
@@ -50,8 +50,7 @@ impl Keys {
     /// Iterate through a number of keys up to a maximum
     pub fn up_to(maximum: u8) -> Self {
         let iterator = cartesian!(States::non_halted_up_to(maximum), Symbols::all()).map(|tuple| {
-            let key: Key = tuple.into();
-            key
+            tuple.into()
         });
         Self {
             iterator: Box::new(iterator),

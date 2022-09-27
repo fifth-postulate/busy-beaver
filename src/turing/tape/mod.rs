@@ -8,11 +8,11 @@ use crate::turing::{direction::Direction, symbol::Symbol};
 pub use compound::CompoundTape;
 pub use simple::SimpleTape;
 
-/// Characteristics of a tape.
+/// The tape of a Turing machine.
 pub trait Tape {
-    /// A tape can be moved in either direction.
+    /// Move the tape head in a direction.
     fn move_to(&mut self, direction: &Direction);
-    /// read the cell the tape head currently points to.
+    /// read the symbol from the cell the tape head currently points to.
     fn read(&self) -> Symbol;
     /// write a symbol to the cell the tape head currently points to.
     fn write(&mut self, symbol: Symbol);

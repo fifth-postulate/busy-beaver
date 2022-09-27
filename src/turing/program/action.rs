@@ -102,8 +102,7 @@ impl Actions {
         let iterator =
             once(Action::Halt).chain(States::non_halted_up_to(maximum).flat_map(|state| {
                 cartesian!(Symbols::all(), Directions::all()).map(move |tuple| {
-                    let action: Action = (tuple.0, tuple.1, state).into();
-                    action
+                    (tuple.0, tuple.1, state).into()
                 })
             }));
         Self {

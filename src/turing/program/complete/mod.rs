@@ -1,14 +1,17 @@
 //! A complete program
-use super::action;
-use super::action::{Action, Actions};
-use super::{Key, Keys};
-use super::{Lookup, Program};
+use super::{
+    action,
+    action::{Action, Actions},
+    Key, Keys, Lookup, Program,
+};
 use cartesian::*;
-use std::convert::Into;
-use std::fmt;
-use std::fmt::{Display, Formatter};
-use std::iter::IntoIterator;
-use std::str::FromStr;
+use std::{
+    convert::Into,
+    fmt,
+    fmt::{Display, Formatter},
+    iter::IntoIterator,
+    str::FromStr,
+};
 
 /// A complete program
 #[derive(Debug, PartialEq, Eq)]
