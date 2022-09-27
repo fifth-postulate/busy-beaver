@@ -368,7 +368,9 @@ pub struct States {
 }
 
 impl States {
-    /// Create an iterator for states up to a maximum state index, including the halt state.
+    /// Create an iterator for states
+    /// up to a maximum state index,
+    /// including the halt state.
     pub fn up_to(maximum: u8) -> Self {
         Self {
             maximum,
@@ -376,7 +378,9 @@ impl States {
         }
     }
 
-    /// Create an iterator for states up to a maximum state index, excluding the halt state.
+    /// Create an iterator for states
+    /// up to a maximum state index,
+    /// excluding the halt state.
     pub fn non_halted_up_to(maximum: u8) -> Self {
         Self {
             maximum,
@@ -469,8 +473,7 @@ impl Actions {
             .flat_map(|state| {
                cartesian!(Symbols::all(), Directions::all())
                .map(move |tuple| {
-                    let action = (tuple.0, tuple.1, state).into();
-                    action
+                    (tuple.0, tuple.1, state).into()
                 })
             }));
         Self {
