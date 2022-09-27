@@ -110,7 +110,8 @@ pub enum Symbol {
 ```rust
 /// The states a Turing machine can be in
 pub enum State {
-    /// The halted state signals that the Turing machine finished operating.
+    /// The halted state signals that
+    /// the Turing machine finished operating.
     Halted,
     /// a non-halted state, indexed by an natural number.
     Number(u8),
@@ -244,6 +245,10 @@ pub fn step(&mut self) -> Progress {
 ---
 ## Halting Problem
 
+--
+
+> Decide for a TM when given input I if the machine halts eventually.
+
 ---
 ## Undecidable
 
@@ -281,7 +286,7 @@ pub fn step(&mut self) -> Progress {
 
 --
 
-> What is the maximum number of steps a Turing Machine with \\(n\\) states can take before it halts.
+> What is the maximum number of steps a Turing Machine with \\(n\\) states can take on the empty tape before it halts.
 
 --
 
@@ -319,12 +324,225 @@ background-size: contain
 ## Plan
 
 ---
-background-image: url(image/how-it-is-going.jpg)
-background-position: center
-background-size: contain
 
-## &#129327;
+```rust
+/// An iterator for `Direction`s.
+pub struct Directions {
+    current: Option<Direction>,
+}
 
+impl Directions {
+    /// Creates an iterator that iterates over all directions.
+    pub fn all() -> Self {
+        Self {
+            current: Some(Direction::Left),
+        }
+    }
+}
+```
+
+---
+
+```rust
+impl Iterator for Directions {
+    type Item = Direction;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let item = self.current;
+        self.current = match item {
+            Some(Direction::Left) => Some(Direction::Right),
+            _ => None,
+        };
+        item
+    }
+}
+```
+
+---
+
+```rust
+/// Iterator for `State`s.
+pub struct States {
+    maximum: u8,
+    current: Option<State>,
+}
+
+impl States {
+    /// Create an iterator for states up to a maximum state index, including the halt state.
+    pub fn up_to(maximum: u8) -> Self {
+        Self {
+            maximum,
+            current: Some(State::Halted),
+        }
+    }
+
+    /// Create an iterator for states up to a maximum state index, excluding the halt state.
+    pub fn non_halted_up_to(maximum: u8) -> Self {
+        Self {
+            maximum,
+            current: Some(State::Number(0)),
+        }
+    }
+}
+```
+
+---
+
+```rust
+impl Iterator for States {
+    type Item = State;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let item = self.current;
+        self.current = match item {
+            Some(State::Halted) => {
+                if self.maximum > 0 {
+                    Some(State::Number(0))
+                } else {
+                    None
+                }
+            }
+            Some(State::Number(m)) => {
+                if m + 1 < self.maximum {
+                    Some(State::Number(m + 1))
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        };
+        item
+    }
+}
+```
+
+---
+
+```rust
+/// Iterator for keys
+pub struct Keys {
+    iterator: Box<dyn Iterator<Item = Key>>,
+}
+
+impl Keys {
+    /// Iterate through a number of keys up to a maximum
+    pub fn up_to(maximum: u8) -> Self {
+        let iterator = cartesian!(
+            States::non_halted_up_to(maximum),
+            Symbols::all()
+        ).map(|tuple| {
+            tuple.into()
+        });
+        Self {
+            iterator: Box::new(iterator),
+        }
+    }
+}
+```
+
+---
+
+```rust
+impl Iterator for Keys {
+    type Item = Key;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iterator.next()
+    }
+}
+```
+
+---
+
+```rust
+/// Iterator for actions
+pub struct Actions {
+    iterator: Box<dyn Iterator<Item = Action>>,
+}
+
+impl Actions {
+    /// Create a iterator that iterates through a number of states up to a maximum.
+    pub fn up_to(maximum: u8) -> Self {
+        let iterator =
+            once(Action::Halt)
+            .chain(States::non_halted_up_to(maximum)
+            .flat_map(|state| {
+               cartesian!(Symbols::all(), Directions::all())
+               .map(move |tuple| {
+                    let action = (tuple.0, tuple.1, state).into();
+                    action
+                })
+            }));
+        Self {
+            iterator: Box::new(iterator),
+        }
+    }
+}
+```
+
+---
+
+```rust
+impl Iterator for Actions {
+    type Item = Action;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iterator.next()
+    }
+}
+```
+
+---
+
+```rust
+/// Iterator for complete progams
+pub struct CompletePrograms {
+    iterator: Box<dyn Iterator<Item = CompleteProgram>>,
+}
+
+impl CompletePrograms {
+    /// Create an iterator that iteratos through all complete programs of a certain number of states
+    pub fn all(n: u8) -> Self {
+        match n {
+            1 => all1(),
+            2 => all2(),
+            3 => all3(),
+            4 => all4(),
+            5 => all5(),
+            _ => panic!("it is unwise to go beyond 5"),
+        }
+    }
+}
+```
+
+---
+
+```rust
+macro_rules! all_programs {
+    ($n:tt, $fname:ident) => {
+        fn $fname() -> CompletePrograms {
+            let iterator = actions!($n)
+            .map(tuple!($n))
+            .map(|actions| {
+                let mut program = CompleteProgram::new();
+                for (key, action) in Keys::up_to($n).zip(actions) {
+                    program.insert(key, action);
+                }
+                program
+            });
+            CompletePrograms {
+                iterator: Box::new(iterator),
+            }
+        }
+    };
+}
+
+all_programs!(1, all1);
+all_programs!(2, all2);
+all_programs!(3, all3);
+all_programs!(4, all4);
+all_programs!(5, all5);
+```
 ---
 
 | | 0 | 1 | 2 | 3 | 4 |
@@ -341,10 +559,61 @@ background-size: contain
 
 ---
 
-| | 0      | 1 | 2 | 3 | 4 |
-|-|--------|---|---|---|---|
+| | 0 | 1 | 2 | 3 | 4 |
+|-|---|---|---|---|---|
 |_|IR1| ? | ? | ? | ? |
-|I| ?      | ? | ? | ? | ? |
+|I| ? | ? | ? | ? | ? |
+
+---
+
+```rust
+/// A complete program
+#[derive(Debug, PartialEq, Eq)]
+pub struct CompleteProgram {
+    program: Vec<Action>,
+}
+```
+
+---
+
+```rust
+/// An incomplete program
+#[derive(Debug, PartialEq, Eq)]
+pub struct IncompleteProgram {
+    n: u8,
+    program: Vec<Option<Action>>,
+}
+```
+
+---
+
+```rust
+/// The result of looking up a certain key in a program.
+pub enum Lookup {
+    /// The key is not known to the program. A semantic error
+    Unknown,
+    /// The key is not known to the program.
+    /// But the program can be extended with the lookup key
+    Indeterminate,
+    /// The determined action for this key
+    Determined(Action),
+}
+```
+
+---
+
+```rust
+impl Program for IncompleteProgram {
+    fn lookup(&self, key: &Key) -> Lookup {
+        let idx = key.idx();
+        match self.program.get(idx) {
+            Some(Some(action)) => Lookup::Determined(*action),
+            Some(None) => Lookup::Indeterminate,
+            None => Lookup::Unknown,
+        }
+    }
+}
+```
 
 ---
 .turing-machine-description[{
@@ -364,6 +633,41 @@ background-size: contain
   "visible_tape": 4,
   "running": false
 }]
+
+---
+
+```rust
+/// A `Tape` implementation that
+/// use a run-length encoding of symbols
+#[derive(Debug, PartialEq, Eq)]
+pub struct CompoundTape {
+    right: Vec<(Symbol, Occurrence)>,
+    left: Vec<(Symbol, Occurrence)>,
+}
+```
+
+--
+
+```rust
+enum Occurrence {
+    Infinite,
+    Finite(usize),
+}
+```
+
+---
+
+```rust
+impl CompoundTape {
+    /// Create an empty tape
+    pub fn empty() -> Self {
+        Self {
+            right: vec![(Symbol::Blank, Occurrence::Infinite)],
+            left: vec![(Symbol::Blank, Occurrence::Infinite)],
+        }
+    }
+}
+```
 
 ---
 ## Discrimination
